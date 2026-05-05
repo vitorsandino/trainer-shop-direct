@@ -3,7 +3,8 @@ import { useEffect, useState } from "react";
 import { CATEGORIES, type Category, type Product, getProducts, upsertProduct, deleteProduct, formatPrice } from "@/lib/products";
 import { Trash2, Plus, X } from "lucide-react";
 
-const ADMIN_PASSWORD = "pokemon123"; // senha simples client-side
+const ADMIN_USER = "admin";
+const ADMIN_PASSWORD = "admin";
 const AUTH_KEY = "pkmn_admin_auth";
 
 export const Route = createFileRoute("/admin")({
@@ -12,6 +13,7 @@ export const Route = createFileRoute("/admin")({
 
 function AdminPage() {
   const [authed, setAuthed] = useState(false);
+  const [user, setUser] = useState("");
   const [pwd, setPwd] = useState("");
   const [err, setErr] = useState("");
 
@@ -23,16 +25,19 @@ function AdminPage() {
     return (
       <div className="container mx-auto flex min-h-[60vh] max-w-sm flex-col justify-center px-4">
         <h1 className="mb-2 font-display text-2xl">Painel Admin</h1>
-        <p className="mb-6 text-sm text-muted-foreground">Senha padrão: <code className="text-secondary">pokemon123</code></p>
+        <p className="mb-6 text-sm text-muted-foreground">Acesse com suas credenciais.</p>
         <form
           onSubmit={(e) => {
             e.preventDefault();
-            if (pwd === ADMIN_PASSWORD) { sessionStorage.setItem(AUTH_KEY, "1"); setAuthed(true); }
-            else setErr("Senha incorreta");
+            if (user === ADMIN_USER && pwd === ADMIN_PASSWORD) {
+              sessionStorage.setItem(AUTH_KEY, "1"); setAuthed(true);
+            } else setErr("Usuário ou senha incorretos");
           }}
           className="space-y-3"
         >
-          <input type="password" value={pwd} onChange={(e) => setPwd(e.target.value)} placeholder="Senha"
+          <input type="text" value={user} onChange={(e) => setUser(e.target.value)} placeholder="Usuário" autoComplete="username"
+            className="w-full rounded-md border border-border bg-input px-4 py-3 outline-none focus:border-primary" />
+          <input type="password" value={pwd} onChange={(e) => setPwd(e.target.value)} placeholder="Senha" autoComplete="current-password"
             className="w-full rounded-md border border-border bg-input px-4 py-3 outline-none focus:border-primary" />
           {err && <p className="text-sm text-destructive">{err}</p>}
           <button className="w-full rounded-md bg-primary py-3 font-bold text-primary-foreground">Entrar</button>
