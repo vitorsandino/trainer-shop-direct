@@ -1,0 +1,206 @@
+import { createFileRoute } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
+import { CATEGORIES, type Category, type Product, getProducts, upsertProduct, deleteProduct, formatPrice } from "@/lib/products";
+import { Trash2, Plus, X } from "lucide-react";
+
+const ADMIN_PASSWORD = "pokemon123"; // senha simples client-side
+const AUTH_KEY = "pkmn_admin_auth";
+
+export const Route = createFileRoute("/admin")({
+  component: AdminPage,
+});
+
+function AdminPage() {
+  const [authed, setAuthed] = useState(false);
+  const [pwd, setPwd] = useState("");
+  const [err, setErr] = useState("");
+
+  useEffect(() => {
+    if (sessionStorage.getItem(AUTH_KEY) === "1") setAuthed(true);
+  }, []);
+
+  if (!authed) {
+    return (
+      <div className="container mx-auto flex min-h-[60vh] max-w-sm flex-col justify-center px-4">
+        <h1 className="mb-2 font-display text-2xl">Painel Admin</h1>
+        <p className="mb-6 text-sm text-muted-foreground">Senha padrão: <code className="text-secondary">pokemon123</code></p>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            if (pwd === ADMIN_PASSWORD) { sessionStorage.setItem(AUTH_KEY, "1"); setAuthed(true); }
+            else setErr("Senha incorreta");
+          }}
+          className="space-y-3"
+        >
+          <input type="password" value={pwd} onChange={(e) => setPwd(e.target.value)} placeholder="Senha"
+            className="w-full rounded-md border border-border bg-input px-4 py-3 outline-none focus:border-primary" />
+          {err && <p className="text-sm text-destructive">{err}</p>}
+          <button className="w-full rounded-md bg-primary py-3 font-bold text-primary-foreground">Entrar</button>
+        </form>
+      </div>
+    );
+  }
+
+  return <AdminDashboard onLogout={() => { sessionStorage.removeItem(AUTH_KEY); setAuthed(false); }} />;
+}
+
+function AdminDashboard({ onLogout }: { onLogout: () => void }) {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [editing, setEditing] = useState<Product | null>(null);
+  const [open, setOpen] = useState(false);
+
+  const refresh = () => setProducts(getProducts());
+  useEffect(() => refresh(), []);
+
+  const handleNew = () => {
+    setEditing({
+      id: crypto.randomUUID(),
+      name: "", category: "booster", price: 0, description: "",
+      images: [], stock: 0, featured: false, createdAt: Date.now(),
+    });
+    setOpen(true);
+  };
+
+  return (
+    <div className="container mx-auto px-4 py-10">
+      <div className="mb-6 flex items-center justify-between">
+        <h1 className="font-display text-3xl">Admin · Produtos</h1>
+        <div className="flex gap-2">
+          <button onClick={handleNew} className="flex items-center gap-2 rounded-md bg-primary px-4 py-2 font-semibold text-primary-foreground">
+            <Plus className="h-4 w-4" /> Novo produto
+          </button>
+          <button onClick={onLogout} className="rounded-md border border-border px-4 py-2 text-sm">Sair</button>
+        </div>
+      </div>
+
+      <div className="overflow-hidden rounded-lg border border-border">
+        <table className="w-full text-sm">
+          <thead className="bg-card">
+            <tr className="text-left">
+              <th className="p-3">Produto</th>
+              <th className="p-3">Categoria</th>
+              <th className="p-3">Preço</th>
+              <th className="p-3">Estoque</th>
+              <th className="p-3"></th>
+            </tr>
+          </thead>
+          <tbody>
+            {products.map(p => (
+              <tr key={p.id} className="border-t border-border hover:bg-card/50">
+                <td className="flex items-center gap-3 p-3">
+                  {p.images[0] && <img src={p.images[0]} alt="" className="h-10 w-10 rounded object-cover" />}
+                  <span className="line-clamp-1">{p.name}</span>
+                </td>
+                <td className="p-3 capitalize text-muted-foreground">{p.category}</td>
+                <td className="p-3">{formatPrice(p.price)}</td>
+                <td className="p-3">{p.stock ?? "-"}</td>
+                <td className="space-x-2 p-3 text-right">
+                  <button onClick={() => { setEditing(p); setOpen(true); }} className="text-secondary hover:underline">Editar</button>
+                  <button onClick={() => { if (confirm("Excluir?")) { deleteProduct(p.id); refresh(); } }} className="text-destructive">
+                    <Trash2 className="inline h-4 w-4" />
+                  </button>
+                </td>
+              </tr>
+            ))}
+            {products.length === 0 && (
+              <tr><td colSpan={5} className="p-6 text-center text-muted-foreground">Nenhum produto</td></tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      {open && editing && (
+        <ProductForm
+          product={editing}
+          onClose={() => setOpen(false)}
+          onSave={(p) => { upsertProduct(p); refresh(); setOpen(false); }}
+        />
+      )}
+    </div>
+  );
+}
+
+function ProductForm({ product, onClose, onSave }: { product: Product; onClose: () => void; onSave: (p: Product) => void }) {
+  const [data, setData] = useState<Product>(product);
+
+  const upload = async (files: FileList | null) => {
+    if (!files) return;
+    const arr = await Promise.all(Array.from(files).map(file => new Promise<string>((res) => {
+      const r = new FileReader();
+      r.onload = () => res(r.result as string);
+      r.readAsDataURL(file);
+    })));
+    setData(d => ({ ...d, images: [...d.images, ...arr] }));
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
+      <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-xl border border-border bg-card p-6">
+        <div className="mb-4 flex items-center justify-between">
+          <h2 className="font-display text-xl">{product.name ? "Editar" : "Novo"} produto</h2>
+          <button onClick={onClose}><X className="h-5 w-5" /></button>
+        </div>
+        <form
+          onSubmit={(e) => { e.preventDefault(); onSave(data); }}
+          className="space-y-4"
+        >
+          <Field label="Nome">
+            <input required value={data.name} onChange={(e) => setData({ ...data, name: e.target.value })} className="input" />
+          </Field>
+          <div className="grid grid-cols-2 gap-4">
+            <Field label="Categoria">
+              <select value={data.category} onChange={(e) => setData({ ...data, category: e.target.value as Category })} className="input">
+                {CATEGORIES.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
+              </select>
+            </Field>
+            <Field label="Preço (R$)">
+              <input required type="number" step="0.01" value={data.price} onChange={(e) => setData({ ...data, price: parseFloat(e.target.value) || 0 })} className="input" />
+            </Field>
+          </div>
+          <Field label="Descrição">
+            <textarea required rows={4} value={data.description} onChange={(e) => setData({ ...data, description: e.target.value })} className="input" />
+          </Field>
+          <div className="grid grid-cols-2 gap-4">
+            <Field label="Estoque (opcional)">
+              <input type="number" value={data.stock ?? 0} onChange={(e) => setData({ ...data, stock: parseInt(e.target.value) || 0 })} className="input" />
+            </Field>
+            <Field label="Destaque na home">
+              <label className="mt-2 flex items-center gap-2">
+                <input type="checkbox" checked={!!data.featured} onChange={(e) => setData({ ...data, featured: e.target.checked })} />
+                <span className="text-sm">Mostrar em destaque</span>
+              </label>
+            </Field>
+          </div>
+          <Field label="Imagens">
+            <input type="file" accept="image/*" multiple onChange={(e) => upload(e.target.files)} className="input" />
+            {data.images.length > 0 && (
+              <div className="mt-3 flex flex-wrap gap-2">
+                {data.images.map((src, i) => (
+                  <div key={i} className="relative h-20 w-20">
+                    <img src={src} alt="" className="h-full w-full rounded object-cover" />
+                    <button type="button" onClick={() => setData({ ...data, images: data.images.filter((_, j) => j !== i) })}
+                      className="absolute -right-2 -top-2 grid h-6 w-6 place-items-center rounded-full bg-destructive text-xs text-destructive-foreground">×</button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </Field>
+          <div className="flex gap-2 pt-2">
+            <button type="button" onClick={onClose} className="flex-1 rounded-md border border-border py-3">Cancelar</button>
+            <button type="submit" className="flex-1 rounded-md bg-primary py-3 font-bold text-primary-foreground">Salvar</button>
+          </div>
+        </form>
+        <style>{`.input{width:100%;border-radius:0.375rem;border:1px solid var(--border);background:var(--input);padding:0.625rem 0.75rem;outline:none;color:var(--foreground)}.input:focus{border-color:var(--primary)}`}</style>
+      </div>
+    </div>
+  );
+}
+
+function Field({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <label className="block">
+      <span className="mb-1 block text-sm font-medium">{label}</span>
+      {children}
+    </label>
+  );
+}
