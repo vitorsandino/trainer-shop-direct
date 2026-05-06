@@ -128,14 +128,55 @@ function AdminDashboard({ onLogout }: { onLogout: () => void }) {
 function ProductForm({ product, onClose, onSave }: { product: Product; onClose: () => void; onSave: (p: Product) => void }) {
   const [data, setData] = useState<Product>(product);
 
+  const [uploading, setUploading] = useState(false);
+
+  const compress = (file: File) => new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const img = new Image();
+      img.onload = () => {
+        const MAX = 1200;
+        let { width, height } = img;
+        if (width > MAX || height > MAX) {
+          const r = Math.min(MAX / width, MAX / height);
+          width = Math.round(width * r);
+          height = Math.round(height * r);
+        }
+        const canvas = document.createElement("canvas");
+        canvas.width = width; canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        if (!ctx) return reject(new Error("canvas"));
+        ctx.drawImage(img, 0, 0, width, height);
+        resolve(canvas.toDataURL("image/jpeg", 0.82));
+      };
+      img.onerror = reject;
+      img.src = reader.result as string;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+
   const upload = async (files: FileList | null) => {
-    if (!files) return;
-    const arr = await Promise.all(Array.from(files).map(file => new Promise<string>((res) => {
-      const r = new FileReader();
-      r.onload = () => res(r.result as string);
-      r.readAsDataURL(file);
-    })));
-    setData(d => ({ ...d, images: [...d.images, ...arr] }));
+    if (!files || files.length === 0) return;
+    setUploading(true);
+    try {
+      const arr: string[] = [];
+      for (const file of Array.from(files)) {
+        try { arr.push(await compress(file)); }
+        catch (err) { console.error("upload", file.name, err); }
+      }
+      setData(d => ({ ...d, images: [...d.images, ...arr] }));
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const move = (i: number, dir: -1 | 1) => {
+    const j = i + dir;
+    if (j < 0 || j >= data.images.length) return;
+    const imgs = [...data.images];
+    [imgs[i], imgs[j]] = [imgs[j], imgs[i]];
+    setData({ ...data, images: imgs });
   };
 
   return (
@@ -176,13 +217,19 @@ function ProductForm({ product, onClose, onSave }: { product: Product; onClose: 
               </label>
             </Field>
           </div>
-          <Field label="Imagens">
-            <input type="file" accept="image/*" multiple onChange={(e) => upload(e.target.files)} className="input" />
+          <Field label="Imagens (você pode enviar várias — a primeira é a capa)">
+            <input type="file" accept="image/*" multiple onChange={(e) => upload(e.target.files)} className="input" disabled={uploading} />
+            {uploading && <p className="mt-2 text-xs text-muted-foreground">Processando imagens...</p>}
             {data.images.length > 0 && (
               <div className="mt-3 flex flex-wrap gap-2">
                 {data.images.map((src, i) => (
-                  <div key={i} className="relative h-20 w-20">
+                  <div key={i} className="group relative h-24 w-24">
                     <img src={src} alt="" className="h-full w-full rounded object-cover" />
+                    {i === 0 && <span className="absolute left-1 top-1 rounded bg-secondary px-1.5 py-0.5 text-[10px] font-bold text-secondary-foreground">CAPA</span>}
+                    <div className="absolute inset-x-0 bottom-0 flex justify-between bg-black/60 px-1 py-0.5 opacity-0 transition group-hover:opacity-100">
+                      <button type="button" onClick={() => move(i, -1)} className="text-xs text-white disabled:opacity-30" disabled={i === 0}>◀</button>
+                      <button type="button" onClick={() => move(i, 1)} className="text-xs text-white disabled:opacity-30" disabled={i === data.images.length - 1}>▶</button>
+                    </div>
                     <button type="button" onClick={() => setData({ ...data, images: data.images.filter((_, j) => j !== i) })}
                       className="absolute -right-2 -top-2 grid h-6 w-6 place-items-center rounded-full bg-destructive text-xs text-destructive-foreground">×</button>
                   </div>

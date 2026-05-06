@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import hero from "@/assets/hero.jpg";
 import { CATEGORIES, getProducts, type Product, whatsappLink } from "@/lib/products";
 import { ProductCard } from "@/components/ProductCard";
+import { CollectionsShowcase } from "@/components/CollectionsShowcase";
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -61,6 +62,8 @@ function Index() {
           ))}
         </div>
       </section>
+
+      <CollectionsShowcase />
 
       {/* Featured */}
       <section className="container mx-auto px-4 py-12">

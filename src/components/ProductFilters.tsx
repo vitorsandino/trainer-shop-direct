@@ -18,6 +18,14 @@ export const defaultFilters: FilterState = {
   categories: [],
 };
 
+const PRICE_RANGES: { label: string; min: string; max: string }[] = [
+  { label: "Até R$50", min: "", max: "50" },
+  { label: "R$50–150", min: "50", max: "150" },
+  { label: "R$150–300", min: "150", max: "300" },
+  { label: "R$300–500", min: "300", max: "500" },
+  { label: "Acima R$500", min: "500", max: "" },
+];
+
 export function applyFilters(products: Product[], f: FilterState, opts?: { lockedCategory?: Category }) {
   const min = f.minPrice ? parseFloat(f.minPrice) : -Infinity;
   const max = f.maxPrice ? parseFloat(f.maxPrice) : Infinity;
@@ -83,6 +91,21 @@ export function ProductFilters({ value, onChange, showCategories, total }: Props
 
       <div>
         <h3 className="mb-2 text-xs font-bold uppercase tracking-widest text-secondary">Preço (R$)</h3>
+        <div className="mb-2 flex flex-wrap gap-1.5">
+          {PRICE_RANGES.map(r => {
+            const active = value.minPrice === r.min && value.maxPrice === r.max;
+            return (
+              <button
+                key={r.label}
+                type="button"
+                onClick={() => onChange({ ...value, minPrice: r.min, maxPrice: r.max })}
+                className={`rounded-full border px-2.5 py-1 text-xs transition ${active ? "border-primary bg-primary/15 text-primary" : "border-border hover:border-secondary"}`}
+              >
+                {r.label}
+              </button>
+            );
+          })}
+        </div>
         <div className="flex items-center gap-2">
           <input
             type="number" placeholder="Min" value={value.minPrice}
