@@ -1,5 +1,6 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
+import { ChevronLeft, ChevronRight, X, ZoomIn } from "lucide-react";
 import { getProduct, type Product, formatPrice, whatsappLink, CATEGORIES } from "@/lib/products";
 
 export const Route = createFileRoute("/produto/$id")({
@@ -10,32 +11,80 @@ function ProductPage() {
   const { id } = Route.useParams();
   const [product, setProduct] = useState<Product | null | undefined>(undefined);
   const [active, setActive] = useState(0);
+  const [lightbox, setLightbox] = useState(false);
 
   useEffect(() => {
     const p = getProduct(id);
     setProduct(p ?? null);
   }, [id]);
 
+  const next = useCallback(() => {
+    if (!product) return;
+    setActive((a) => (a + 1) % product.images.length);
+  }, [product]);
+  const prev = useCallback(() => {
+    if (!product) return;
+    setActive((a) => (a - 1 + product.images.length) % product.images.length);
+  }, [product]);
+
+  useEffect(() => {
+    if (!lightbox) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setLightbox(false);
+      if (e.key === "ArrowRight") next();
+      if (e.key === "ArrowLeft") prev();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [lightbox, next, prev]);
+
   if (product === undefined) return <div className="container mx-auto px-4 py-20 text-center text-muted-foreground">Carregando...</div>;
   if (product === null) throw notFound();
 
   const catLabel = CATEGORIES.find(c => c.value === product.category)?.label;
+  const hasImages = product.images.length > 0;
 
   return (
-    <div className="container mx-auto px-4 py-10">
-      <Link to="/" className="mb-6 inline-block text-sm text-muted-foreground hover:text-secondary">← Voltar</Link>
-      <div className="grid gap-8 lg:grid-cols-2">
+    <div className="container mx-auto px-4 py-6 md:py-10">
+      <Link to="/" className="mb-4 inline-block text-sm text-muted-foreground hover:text-secondary">← Voltar</Link>
+      <div className="grid gap-6 md:gap-8 lg:grid-cols-2">
         <div>
-          <div className="aspect-square overflow-hidden rounded-2xl border border-border bg-card">
-            <img src={product.images[active]} alt={product.name} className="h-full w-full object-cover" />
+          <div className="group relative aspect-square overflow-hidden rounded-2xl border border-border bg-card">
+            {hasImages && (
+              <>
+                <img
+                  src={product.images[active]}
+                  alt={product.name}
+                  className="h-full w-full cursor-zoom-in object-cover"
+                  onClick={() => setLightbox(true)}
+                />
+                <button
+                  onClick={() => setLightbox(true)}
+                  aria-label="Ampliar"
+                  className="absolute right-3 top-3 grid h-10 w-10 place-items-center rounded-full bg-black/60 text-white opacity-0 transition group-hover:opacity-100"
+                >
+                  <ZoomIn className="h-5 w-5" />
+                </button>
+                {product.images.length > 1 && (
+                  <>
+                    <button onClick={prev} aria-label="Anterior" className="absolute left-2 top-1/2 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-full bg-black/60 text-white">
+                      <ChevronLeft className="h-5 w-5" />
+                    </button>
+                    <button onClick={next} aria-label="Próxima" className="absolute right-2 top-1/2 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-full bg-black/60 text-white">
+                      <ChevronRight className="h-5 w-5" />
+                    </button>
+                  </>
+                )}
+              </>
+            )}
           </div>
           {product.images.length > 1 && (
-            <div className="mt-3 flex gap-2 overflow-x-auto">
+            <div className="mt-3 flex gap-2 overflow-x-auto pb-1">
               {product.images.map((src, i) => (
                 <button
                   key={i}
                   onClick={() => setActive(i)}
-                  className={`h-20 w-20 shrink-0 overflow-hidden rounded-md border-2 ${i === active ? "border-primary" : "border-border"}`}
+                  className={`h-16 w-16 shrink-0 overflow-hidden rounded-md border-2 sm:h-20 sm:w-20 ${i === active ? "border-primary" : "border-border"}`}
                 >
                   <img src={src} alt="" className="h-full w-full object-cover" />
                 </button>
@@ -44,10 +93,10 @@ function ProductPage() {
           )}
         </div>
 
-        <div className="space-y-5">
+        <div className="space-y-4 md:space-y-5">
           <p className="text-xs uppercase tracking-widest text-secondary">{catLabel}</p>
-          <h1 className="font-display text-3xl md:text-4xl">{product.name}</h1>
-          <p className="font-display text-4xl text-primary">{formatPrice(product.price)}</p>
+          <h1 className="font-display text-2xl md:text-4xl">{product.name}</h1>
+          <p className="font-display text-3xl text-primary md:text-4xl">{formatPrice(product.price)}</p>
           {product.stock !== undefined && (
             <p className="text-sm text-muted-foreground">
               {product.stock > 0 ? `${product.stock} em estoque` : "Esgotado"}
@@ -68,6 +117,33 @@ function ProductPage() {
           </p>
         </div>
       </div>
+
+      {lightbox && hasImages && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 p-4" onClick={() => setLightbox(false)}>
+          <button onClick={() => setLightbox(false)} className="absolute right-4 top-4 grid h-10 w-10 place-items-center rounded-full bg-white/10 text-white" aria-label="Fechar">
+            <X className="h-5 w-5" />
+          </button>
+          {product.images.length > 1 && (
+            <>
+              <button onClick={(e) => { e.stopPropagation(); prev(); }} aria-label="Anterior" className="absolute left-2 grid h-12 w-12 place-items-center rounded-full bg-white/10 text-white md:left-6">
+                <ChevronLeft className="h-6 w-6" />
+              </button>
+              <button onClick={(e) => { e.stopPropagation(); next(); }} aria-label="Próxima" className="absolute right-2 grid h-12 w-12 place-items-center rounded-full bg-white/10 text-white md:right-6">
+                <ChevronRight className="h-6 w-6" />
+              </button>
+            </>
+          )}
+          <img
+            src={product.images[active]}
+            alt={product.name}
+            className="max-h-[88vh] max-w-[92vw] object-contain"
+            onClick={(e) => e.stopPropagation()}
+          />
+          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 rounded-full bg-white/10 px-3 py-1 text-xs text-white">
+            {active + 1} / {product.images.length}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
