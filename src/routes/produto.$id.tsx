@@ -16,6 +16,7 @@ function ProductPage() {
   useEffect(() => {
     const p = getProduct(id);
     setProduct(p ?? null);
+    if (p) trackProductView(p.id);
   }, [id]);
 
   const next = useCallback(() => {
