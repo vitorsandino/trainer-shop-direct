@@ -109,6 +109,7 @@ function ProductPage() {
           <a
             href={whatsappLink(product.name)}
             target="_blank" rel="noopener noreferrer"
+            onClick={() => trackProductClick(product.id)}
             className="block w-full rounded-lg bg-whatsapp py-4 text-center text-lg font-bold text-whatsapp-foreground shadow-lg transition hover:brightness-110"
           >
             Comprar via WhatsApp
