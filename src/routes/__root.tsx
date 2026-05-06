@@ -76,6 +76,12 @@ function RootShell({ children }: { children: React.ReactNode }) {
 }
 
 function RootComponent() {
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  useEffect(() => {
+    if (typeof window !== "undefined" && !pathname.startsWith("/admin")) {
+      trackPageView(pathname);
+    }
+  }, [pathname]);
   return (
     <div className="flex min-h-screen flex-col">
       <Header />
