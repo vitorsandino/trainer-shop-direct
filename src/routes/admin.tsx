@@ -217,13 +217,19 @@ function ProductForm({ product, onClose, onSave }: { product: Product; onClose: 
               </label>
             </Field>
           </div>
-          <Field label="Imagens">
-            <input type="file" accept="image/*" multiple onChange={(e) => upload(e.target.files)} className="input" />
+          <Field label="Imagens (você pode enviar várias — a primeira é a capa)">
+            <input type="file" accept="image/*" multiple onChange={(e) => upload(e.target.files)} className="input" disabled={uploading} />
+            {uploading && <p className="mt-2 text-xs text-muted-foreground">Processando imagens...</p>}
             {data.images.length > 0 && (
               <div className="mt-3 flex flex-wrap gap-2">
                 {data.images.map((src, i) => (
-                  <div key={i} className="relative h-20 w-20">
+                  <div key={i} className="group relative h-24 w-24">
                     <img src={src} alt="" className="h-full w-full rounded object-cover" />
+                    {i === 0 && <span className="absolute left-1 top-1 rounded bg-secondary px-1.5 py-0.5 text-[10px] font-bold text-secondary-foreground">CAPA</span>}
+                    <div className="absolute inset-x-0 bottom-0 flex justify-between bg-black/60 px-1 py-0.5 opacity-0 transition group-hover:opacity-100">
+                      <button type="button" onClick={() => move(i, -1)} className="text-xs text-white disabled:opacity-30" disabled={i === 0}>◀</button>
+                      <button type="button" onClick={() => move(i, 1)} className="text-xs text-white disabled:opacity-30" disabled={i === data.images.length - 1}>▶</button>
+                    </div>
                     <button type="button" onClick={() => setData({ ...data, images: data.images.filter((_, j) => j !== i) })}
                       className="absolute -right-2 -top-2 grid h-6 w-6 place-items-center rounded-full bg-destructive text-xs text-destructive-foreground">×</button>
                   </div>
