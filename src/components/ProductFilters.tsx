@@ -83,6 +83,21 @@ export function ProductFilters({ value, onChange, showCategories, total }: Props
 
       <div>
         <h3 className="mb-2 text-xs font-bold uppercase tracking-widest text-secondary">Preço (R$)</h3>
+        <div className="mb-2 flex flex-wrap gap-1.5">
+          {PRICE_RANGES.map(r => {
+            const active = value.minPrice === r.min && value.maxPrice === r.max;
+            return (
+              <button
+                key={r.label}
+                type="button"
+                onClick={() => onChange({ ...value, minPrice: r.min, maxPrice: r.max })}
+                className={`rounded-full border px-2.5 py-1 text-xs transition ${active ? "border-primary bg-primary/15 text-primary" : "border-border hover:border-secondary"}`}
+              >
+                {r.label}
+              </button>
+            );
+          })}
+        </div>
         <div className="flex items-center gap-2">
           <input
             type="number" placeholder="Min" value={value.minPrice}
