@@ -22,54 +22,9 @@ export type Product = {
   createdAt: number;
 };
 
-const KEY = "pkmn_products_v1";
+const KEY = "pkmn_products_v2";
 
-const seed: Product[] = [
-  {
-    id: "p1",
-    name: "Booster Escarlate & Violeta - 151",
-    category: "booster",
-    price: 34.9,
-    description: "Pacote com 10 cards aleatórios da coleção 151. Reviva os Pokémon originais de Kanto.",
-    images: ["https://images.unsplash.com/photo-1647892750571-b29162a23eef?w=800"],
-    stock: 50,
-    featured: true,
-    createdAt: Date.now(),
-  },
-  {
-    id: "p2",
-    name: "Elite Trainer Box - Paldea Evolved",
-    category: "box",
-    price: 349.9,
-    description: "Box completa com 9 boosters, dados, contadores e acessórios oficiais.",
-    images: ["https://images.unsplash.com/photo-1628968434441-d9c61d7a35dd?w=800"],
-    stock: 12,
-    featured: true,
-    createdAt: Date.now(),
-  },
-  {
-    id: "p3",
-    name: "Coleção Especial Charizard ex",
-    category: "colecoes",
-    price: 219.9,
-    description: "Coleção com card promo Charizard ex, 4 boosters e moeda oficial.",
-    images: ["https://images.unsplash.com/photo-1613771404784-3a5686aa2be3?w=800"],
-    stock: 8,
-    featured: true,
-    createdAt: Date.now(),
-  },
-  {
-    id: "p4",
-    name: "Pikachu VMAX Rainbow",
-    category: "avulsas",
-    price: 489.0,
-    description: "Card avulso ultra raro Pikachu VMAX em arte secreta rainbow. Estado: NM.",
-    images: ["https://images.unsplash.com/photo-1542779283-429940ce8336?w=800"],
-    stock: 1,
-    featured: true,
-    createdAt: Date.now(),
-  },
-];
+const seed: Product[] = [];
 
 export function getProducts(): Product[] {
   if (typeof window === "undefined") return seed;
