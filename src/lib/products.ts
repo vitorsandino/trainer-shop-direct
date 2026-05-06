@@ -21,13 +21,24 @@ export function getCategories(): CategoryDef[] {
   try { return JSON.parse(raw); } catch { return DEFAULT_CATEGORIES; }
 }
 
+const catListeners = new Set<() => void>();
+export function subscribeCategories(cb: () => void) {
+  catListeners.add(cb);
+  return () => catListeners.delete(cb);
+}
 export function saveCategories(list: CategoryDef[]) {
   localStorage.setItem(CAT_KEY, JSON.stringify(list));
+  catListeners.forEach(cb => cb());
 }
 
-// Backwards compatibility for components that import CATEGORIES directly
-export const CATEGORIES: CategoryDef[] =
-  typeof window !== "undefined" ? getCategories() : DEFAULT_CATEGORIES;
+// Backwards compatibility — getter-style array (re-reads each access)
+export const CATEGORIES: CategoryDef[] = new Proxy([] as CategoryDef[], {
+  get(_t, prop) {
+    const list = typeof window !== "undefined" ? getCategories() : DEFAULT_CATEGORIES;
+    // @ts-ignore
+    return list[prop];
+  },
+}) as unknown as CategoryDef[];
 
 export function slugify(s: string) {
   return s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
