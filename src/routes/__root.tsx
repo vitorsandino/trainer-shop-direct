@@ -33,11 +33,11 @@ export const Route = createRootRoute({
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "teste" },
-      { name: "description", content: "teste" },
-      { name: "author", content: "PokéTCG Store" },
-      { property: "og:title", content: "teste" },
-      { property: "og:description", content: "teste" },
+      { title: "Pandex Store — Pokémon TCG no Atacado e Varejo" },
+      { name: "description", content: "Pandex Store: boosters, ETBs, coleções e cards Pokémon TCG. Atacado e varejo com atendimento rápido." },
+      { name: "author", content: "Pandex Store" },
+      { property: "og:title", content: "Pandex Store — Pokémon TCG" },
+      { property: "og:description", content: "Boosters, ETBs e coleções Pokémon TCG com o panda mais fofo do Brasil." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
@@ -67,7 +67,7 @@ function RootShell({ children }: { children: React.ReactNode }) {
       <body>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
-        <link href="https://fonts.googleapis.com/css2?family=Russo+One&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+        <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
         {children}
         <Scripts />
       </body>
