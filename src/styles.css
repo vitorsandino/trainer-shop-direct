@@ -72,10 +72,6 @@
   --shadow-card: 0 8px 30px oklch(0.18 0.02 160 / 0.12);
 }
 
-@theme inline {
-  --color-topbar: var(--topbar);
-  --color-topbar-foreground: var(--topbar-foreground);
-}
 
 @layer base {
   * { border-color: var(--color-border); }
