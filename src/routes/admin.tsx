@@ -128,14 +128,55 @@ function AdminDashboard({ onLogout }: { onLogout: () => void }) {
 function ProductForm({ product, onClose, onSave }: { product: Product; onClose: () => void; onSave: (p: Product) => void }) {
   const [data, setData] = useState<Product>(product);
 
+  const [uploading, setUploading] = useState(false);
+
+  const compress = (file: File) => new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const img = new Image();
+      img.onload = () => {
+        const MAX = 1200;
+        let { width, height } = img;
+        if (width > MAX || height > MAX) {
+          const r = Math.min(MAX / width, MAX / height);
+          width = Math.round(width * r);
+          height = Math.round(height * r);
+        }
+        const canvas = document.createElement("canvas");
+        canvas.width = width; canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        if (!ctx) return reject(new Error("canvas"));
+        ctx.drawImage(img, 0, 0, width, height);
+        resolve(canvas.toDataURL("image/jpeg", 0.82));
+      };
+      img.onerror = reject;
+      img.src = reader.result as string;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+
   const upload = async (files: FileList | null) => {
-    if (!files) return;
-    const arr = await Promise.all(Array.from(files).map(file => new Promise<string>((res) => {
-      const r = new FileReader();
-      r.onload = () => res(r.result as string);
-      r.readAsDataURL(file);
-    })));
-    setData(d => ({ ...d, images: [...d.images, ...arr] }));
+    if (!files || files.length === 0) return;
+    setUploading(true);
+    try {
+      const arr: string[] = [];
+      for (const file of Array.from(files)) {
+        try { arr.push(await compress(file)); }
+        catch (err) { console.error("upload", file.name, err); }
+      }
+      setData(d => ({ ...d, images: [...d.images, ...arr] }));
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const move = (i: number, dir: -1 | 1) => {
+    const j = i + dir;
+    if (j < 0 || j >= data.images.length) return;
+    const imgs = [...data.images];
+    [imgs[i], imgs[j]] = [imgs[j], imgs[i]];
+    setData({ ...data, images: imgs });
   };
 
   return (
