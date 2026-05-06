@@ -63,6 +63,8 @@ function Index() {
         </div>
       </section>
 
+      <CollectionsShowcase />
+
       {/* Featured */}
       <section className="container mx-auto px-4 py-12">
         <div className="mb-6 flex items-end justify-between">
