@@ -1,6 +1,8 @@
-import { Outlet, Link, createRootRoute, HeadContent, Scripts } from "@tanstack/react-router";
+import { Outlet, Link, createRootRoute, HeadContent, Scripts, useRouterState } from "@tanstack/react-router";
+import { useEffect } from "react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { trackPageView } from "@/lib/products";
 
 import appCss from "../styles.css?url";
 
@@ -74,6 +76,12 @@ function RootShell({ children }: { children: React.ReactNode }) {
 }
 
 function RootComponent() {
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  useEffect(() => {
+    if (typeof window !== "undefined" && !pathname.startsWith("/admin")) {
+      trackPageView(pathname);
+    }
+  }, [pathname]);
   return (
     <div className="flex min-h-screen flex-col">
       <Header />

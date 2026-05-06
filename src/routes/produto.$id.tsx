@@ -1,7 +1,7 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useEffect, useState, useCallback } from "react";
 import { ChevronLeft, ChevronRight, X, ZoomIn } from "lucide-react";
-import { getProduct, type Product, formatPrice, whatsappLink, CATEGORIES } from "@/lib/products";
+import { getProduct, type Product, formatPrice, whatsappLink, CATEGORIES, trackProductView, trackProductClick } from "@/lib/products";
 
 export const Route = createFileRoute("/produto/$id")({
   component: ProductPage,
@@ -16,6 +16,7 @@ function ProductPage() {
   useEffect(() => {
     const p = getProduct(id);
     setProduct(p ?? null);
+    if (p) trackProductView(p.id);
   }, [id]);
 
   const next = useCallback(() => {
@@ -108,6 +109,7 @@ function ProductPage() {
           <a
             href={whatsappLink(product.name)}
             target="_blank" rel="noopener noreferrer"
+            onClick={() => trackProductClick(product.id)}
             className="block w-full rounded-lg bg-whatsapp py-4 text-center text-lg font-bold text-whatsapp-foreground shadow-lg transition hover:brightness-110"
           >
             Comprar via WhatsApp
