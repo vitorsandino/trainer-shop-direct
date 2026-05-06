@@ -30,6 +30,8 @@
   --color-ring: var(--ring);
   --color-whatsapp: var(--whatsapp);
   --color-whatsapp-foreground: var(--whatsapp-foreground);
+  --color-topbar: var(--topbar);
+  --color-topbar-foreground: var(--topbar-foreground);
   --font-display: "Fredoka", "Russo One", system-ui, sans-serif;
 }
 
