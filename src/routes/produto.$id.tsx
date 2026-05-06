@@ -1,7 +1,7 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useEffect, useState, useCallback } from "react";
 import { ChevronLeft, ChevronRight, X, ZoomIn } from "lucide-react";
-import { getProduct, type Product, formatPrice, whatsappLink, CATEGORIES } from "@/lib/products";
+import { getProduct, type Product, formatPrice, whatsappLink, CATEGORIES, trackProductView, trackProductClick } from "@/lib/products";
 
 export const Route = createFileRoute("/produto/$id")({
   component: ProductPage,
