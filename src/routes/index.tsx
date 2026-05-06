@@ -1,7 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Truck, ShieldCheck, MessageCircle, Sparkles } from "lucide-react";
-import hero from "@/assets/pandex-hero.jpg";
 import { CATEGORIES, getProducts, type Product, whatsappLink } from "@/lib/products";
 import { ProductCard } from "@/components/ProductCard";
 import { CollectionsShowcase } from "@/components/CollectionsShowcase";
@@ -18,44 +17,8 @@ function Index() {
 
   return (
     <div>
-      {/* Hero */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-primary/10 via-background to-secondary/10">
-        <div className="container mx-auto grid gap-8 px-4 py-10 md:grid-cols-2 md:items-center md:py-16">
-          <div className="space-y-5">
-            <span className="inline-flex items-center gap-2 rounded-full bg-secondary/20 px-3 py-1 text-xs font-bold uppercase tracking-widest text-secondary-foreground">
-              <Sparkles className="h-3.5 w-3.5" /> Pokémon TCG · Atacado e varejo
-            </span>
-            <h1 className="font-display text-4xl leading-[1.05] text-foreground md:text-6xl">
-              A loja do <span className="text-primary">panda</span> mais fofo do <span className="text-secondary">TCG</span>
-            </h1>
-            <p className="max-w-lg text-base text-muted-foreground md:text-lg">
-              Boosters, Elite Trainer Boxes, coleções e cards avulsos com preço justo, envio rápido e atendimento humano via WhatsApp.
-            </p>
-            <div className="flex flex-wrap gap-3">
-              <Link to="/categoria/$slug" params={{ slug: CATEGORIES[0]?.value ?? "booster" }} className="rounded-full bg-primary px-6 py-3 text-sm font-bold text-primary-foreground shadow-lg transition hover:brightness-110">
-                Ver catálogo
-              </Link>
-              <a href={whatsappLink("Catálogo Pandex Store")} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-6 py-3 text-sm font-bold transition hover:border-primary">
-                <MessageCircle className="h-4 w-4" /> Falar no WhatsApp
-              </a>
-            </div>
-            <div className="flex flex-wrap gap-4 pt-2 text-xs text-muted-foreground">
-              <span className="inline-flex items-center gap-1.5"><ShieldCheck className="h-4 w-4 text-primary" /> Lacrados originais</span>
-              <span className="inline-flex items-center gap-1.5"><Truck className="h-4 w-4 text-primary" /> Envio para todo Brasil</span>
-            </div>
-          </div>
-          <div className="relative">
-            <img src={hero} alt="Pandex panda mascote" width={1920} height={900} className="aspect-[4/3] w-full rounded-3xl object-cover shadow-[var(--shadow-card)]" />
-            <div className="absolute -bottom-4 -left-4 hidden rounded-2xl bg-card px-4 py-3 shadow-lg md:block">
-              <p className="text-xs text-muted-foreground">Avaliação dos clientes</p>
-              <p className="font-display text-lg text-foreground">⭐ 4.9 / 5.0</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Categorias quick-nav (logo abaixo do hero pra cliente já navegar) */}
-      <section className="border-y border-border bg-card/50">
+      {/* Categorias quick-nav — primeira coisa que o cliente vê */}
+      <section className="border-b border-border bg-card">
         <div className="container mx-auto flex gap-3 overflow-x-auto px-4 py-4">
           {CATEGORIES.map(c => (
             <Link
@@ -67,6 +30,35 @@ function Index() {
               {c.label}
             </Link>
           ))}
+        </div>
+      </section>
+
+      {/* Hero compacto, sem imagem grande */}
+      <section className="relative overflow-hidden bg-gradient-to-br from-primary/10 via-background to-secondary/15">
+        <div className="container mx-auto px-4 py-10 md:py-14">
+          <div className="max-w-3xl space-y-4">
+            <span className="inline-flex items-center gap-2 rounded-full bg-secondary/25 px-3 py-1 text-xs font-bold uppercase tracking-widest text-secondary-foreground">
+              <Sparkles className="h-3.5 w-3.5" /> Pokémon TCG · Atacado e varejo
+            </span>
+            <h1 className="font-display text-3xl leading-[1.05] text-foreground md:text-5xl">
+              A loja do <span className="text-primary">panda</span> mais fofo do <span className="text-secondary">TCG</span>
+            </h1>
+            <p className="max-w-xl text-sm text-muted-foreground md:text-base">
+              Boosters, Elite Trainer Boxes, coleções e cards avulsos. Preço justo, envio rápido e atendimento humano.
+            </p>
+            <div className="flex flex-wrap gap-3">
+              <Link to="/categoria/$slug" params={{ slug: CATEGORIES[0]?.value ?? "booster" }} className="rounded-full bg-primary px-6 py-3 text-sm font-bold text-primary-foreground shadow-lg transition hover:brightness-110">
+                Ver catálogo
+              </Link>
+              <a href={whatsappLink("Catálogo Pandex Store")} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-6 py-3 text-sm font-bold transition hover:border-primary">
+                <MessageCircle className="h-4 w-4" /> WhatsApp
+              </a>
+            </div>
+            <div className="flex flex-wrap gap-4 pt-1 text-xs text-muted-foreground">
+              <span className="inline-flex items-center gap-1.5"><ShieldCheck className="h-4 w-4 text-primary" /> Lacrados originais</span>
+              <span className="inline-flex items-center gap-1.5"><Truck className="h-4 w-4 text-primary" /> Envio para todo Brasil</span>
+            </div>
+          </div>
         </div>
       </section>
 
