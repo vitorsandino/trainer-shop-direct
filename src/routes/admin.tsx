@@ -61,7 +61,7 @@ function AdminDashboard({ onLogout }: { onLogout: () => void }) {
     setEditing({
       id: crypto.randomUUID(),
       name: "", category: "booster", price: 0, description: "",
-      images: [], stock: 0, featured: false, createdAt: Date.now(),
+      images: [], stock: 0, featured: false, banner: false, bannerSubtitle: "", bannerBadge: "", createdAt: Date.now(),
     });
     setOpen(true);
   };
@@ -216,6 +216,22 @@ function ProductForm({ product, onClose, onSave }: { product: Product; onClose: 
                 <span className="text-sm">Mostrar em destaque</span>
               </label>
             </Field>
+          </div>
+          <div className="rounded-lg border border-border bg-background/40 p-4 space-y-3">
+            <label className="flex items-center gap-2">
+              <input type="checkbox" checked={!!data.banner} onChange={(e) => setData({ ...data, banner: e.target.checked })} />
+              <span className="text-sm font-semibold">📢 Exibir no banner da tela inicial</span>
+            </label>
+            {data.banner && (
+              <div className="grid grid-cols-2 gap-3">
+                <Field label="Subtítulo do banner (ex: Coleção clássica)">
+                  <input value={data.bannerSubtitle ?? ""} onChange={(e) => setData({ ...data, bannerSubtitle: e.target.value })} className="input" />
+                </Field>
+                <Field label="Selo (ex: LANÇAMENTO, IMPORTADO)">
+                  <input value={data.bannerBadge ?? ""} onChange={(e) => setData({ ...data, bannerBadge: e.target.value })} className="input" />
+                </Field>
+              </div>
+            )}
           </div>
           <Field label="Imagens (você pode enviar várias — a primeira é a capa)">
             <input type="file" accept="image/*" multiple onChange={(e) => upload(e.target.files)} className="input" disabled={uploading} />

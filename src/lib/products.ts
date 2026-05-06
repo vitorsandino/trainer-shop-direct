@@ -16,6 +16,9 @@ export type Product = {
   images: string[];
   stock?: number;
   featured?: boolean;
+  banner?: boolean;
+  bannerSubtitle?: string;
+  bannerBadge?: string;
   createdAt: number;
 };
 
