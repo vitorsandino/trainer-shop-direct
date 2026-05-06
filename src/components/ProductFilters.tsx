@@ -18,6 +18,14 @@ export const defaultFilters: FilterState = {
   categories: [],
 };
 
+const PRICE_RANGES: { label: string; min: string; max: string }[] = [
+  { label: "Até R$50", min: "", max: "50" },
+  { label: "R$50–150", min: "50", max: "150" },
+  { label: "R$150–300", min: "150", max: "300" },
+  { label: "R$300–500", min: "300", max: "500" },
+  { label: "Acima R$500", min: "500", max: "" },
+];
+
 export function applyFilters(products: Product[], f: FilterState, opts?: { lockedCategory?: Category }) {
   const min = f.minPrice ? parseFloat(f.minPrice) : -Infinity;
   const max = f.maxPrice ? parseFloat(f.maxPrice) : Infinity;
