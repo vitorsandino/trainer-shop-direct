@@ -213,7 +213,10 @@ function ProductsTab() {
 
 function useGetCategories() {
   const [cats, setCats] = useState<CategoryDef[]>(() => (typeof window !== "undefined" ? getCategories() : []));
-  useEffect(() => subscribeCategories(() => setCats(getCategories())), []);
+  useEffect(() => {
+    const unsub = subscribeCategories(() => setCats(getCategories()));
+    return () => { unsub; };
+  }, []);
   return cats;
 }
 
