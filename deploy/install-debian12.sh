@@ -9,9 +9,9 @@
 # ============================================================
 set -euo pipefail
 
-REPO_URL="${REPO_URL:?defina REPO_URL=https://github.com/usuario/repo.git}"
-DOMAIN="${DOMAIN:?defina DOMAIN=seudominio.com}"
-APP_NAME="${APP_NAME:-app}"
+REPO_URL="${REPO_URL:-https://github.com/vitorsandino/trainer-shop-direct.git}"
+DOMAIN="${DOMAIN:?defina DOMAIN=seudominio.com (ex: DOMAIN=meusite.com.br)}"
+APP_NAME="${APP_NAME:-trainer-shop-direct}"
 APP_DIR="/var/www/${APP_NAME}"
 PORT="${PORT:-3000}"
 NODE_MAJOR="20"
