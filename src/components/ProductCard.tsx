@@ -88,11 +88,16 @@ export function ProductCard({ product }: { product: Product }) {
       {/* CTA — sempre visível no mobile, surge no hover no desktop */}
       <button
         type="button"
-        onClick={(e) => { e.preventDefault(); addToCart(product.id, 1); }}
-        className="m-3 mt-0 inline-flex items-center justify-center gap-1.5 rounded-md bg-primary px-3 py-2.5 text-xs font-bold text-primary-foreground shadow transition hover:brightness-110 sm:m-4 sm:mt-0 sm:translate-y-2 sm:opacity-0 sm:group-hover:translate-y-0 sm:group-hover:opacity-100"
+        disabled={typeof product.stock === "number" && product.stock <= 0}
+        onClick={(e) => {
+          e.preventDefault();
+          const r = addToCart(product.id, 1);
+          if (r.added === 0 && r.capped) alert("Produto esgotado.");
+        }}
+        className="m-3 mt-0 inline-flex items-center justify-center gap-1.5 rounded-md bg-primary px-3 py-2.5 text-xs font-bold text-primary-foreground shadow transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50 sm:m-4 sm:mt-0 sm:translate-y-2 sm:opacity-0 sm:group-hover:translate-y-0 sm:group-hover:opacity-100"
         aria-label={`Adicionar ${product.name} ao carrinho`}
       >
-        <ShoppingCart className="h-3.5 w-3.5" /> Adicionar
+        <ShoppingCart className="h-3.5 w-3.5" /> {typeof product.stock === "number" && product.stock <= 0 ? "Esgotado" : "Adicionar"}
       </button>
     </div>
   );
