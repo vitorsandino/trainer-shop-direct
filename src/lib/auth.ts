@@ -219,6 +219,10 @@ export async function register(input: { name: string; email: string; phone?: str
   hydrated = true;
   removeLegacyUser(email);
   emit();
+  // dispara boas-vindas (não bloqueia o fluxo)
+  void import("@/lib/email.functions").then(m =>
+    m.sendWelcomeEmail({ data: { email, name } }).catch(err => console.warn("[email] welcome:", err))
+  );
   return currentUser;
 }
 

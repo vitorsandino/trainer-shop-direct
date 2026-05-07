@@ -93,20 +93,44 @@ export function createOrder(o: Omit<Order, "id" | "code" | "status" | "history" 
 }
 
 export function updateOrderStatus(id: string, status: OrderStatus, note?: string) {
+  let target: Order | undefined;
   const list = getOrders().map(o => {
     if (o.id !== id) return o;
-    return {
+    const updated = {
       ...o,
       status,
       updatedAt: Date.now(),
       history: [...o.history, { at: Date.now(), status, note }],
     };
+    target = updated;
+    return updated;
   });
   save(list);
+  if (target && target.userEmail) {
+    void import("@/lib/email.functions").then(m =>
+      m.sendOrderStatusUpdate({ data: {
+        email: target!.userEmail, code: target!.code, userName: target!.userName,
+        status: target!.status, trackingCode: target!.trackingCode,
+      }}).catch(err => console.warn("[email] status:", err))
+    );
+  }
 }
 
 export function setTrackingCode(id: string, code: string) {
-  save(getOrders().map(o => o.id === id ? { ...o, trackingCode: code, updatedAt: Date.now() } : o));
+  let target: Order | undefined;
+  save(getOrders().map(o => {
+    if (o.id !== id) return o;
+    target = { ...o, trackingCode: code, updatedAt: Date.now() };
+    return target;
+  }));
+  if (target && target.userEmail) {
+    void import("@/lib/email.functions").then(m =>
+      m.sendOrderStatusUpdate({ data: {
+        email: target!.userEmail, code: target!.code, userName: target!.userName,
+        status: target!.status, trackingCode: target!.trackingCode,
+      }}).catch(err => console.warn("[email] tracking:", err))
+    );
+  }
 }
 
 export function getOrdersByUser(userId: string): Order[] {

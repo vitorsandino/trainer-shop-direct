@@ -61,6 +61,11 @@ function LoginPage() {
             {busy ? "Aguarde..." : mode === "login" ? "Entrar" : "Criar conta e entrar"}
           </button>
         </form>
+        {mode === "login" && (
+          <p className="mt-3 text-center text-xs">
+            <Link to="/esqueci-senha" className="text-primary hover:underline">Esqueci minha senha</Link>
+          </p>
+        )}
         <p className="mt-4 text-center text-xs text-muted-foreground">
           <Link to="/" className="hover:text-primary">← Voltar para a loja</Link>
         </p>

@@ -9,7 +9,9 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as EsqueciSenhaRouteImport } from './routes/esqueci-senha'
 import { Route as ContatoRouteImport } from './routes/contato'
 import { Route as ContaRouteImport } from './routes/conta'
 import { Route as CheckoutRouteImport } from './routes/checkout'
@@ -23,9 +25,19 @@ import { Route as CategoriaSlugRouteImport } from './routes/categoria.$slug'
 import { Route as ContaPedidosIndexRouteImport } from './routes/conta.pedidos.index'
 import { Route as ContaPedidosIdRouteImport } from './routes/conta.pedidos.$id'
 
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EsqueciSenhaRoute = EsqueciSenhaRouteImport.update({
+  id: '/esqueci-senha',
+  path: '/esqueci-senha',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ContatoRoute = ContatoRouteImport.update({
@@ -97,7 +109,9 @@ export interface FileRoutesByFullPath {
   '/checkout': typeof CheckoutRoute
   '/conta': typeof ContaRouteWithChildren
   '/contato': typeof ContatoRoute
+  '/esqueci-senha': typeof EsqueciSenhaRoute
   '/login': typeof LoginRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/categoria/$slug': typeof CategoriaSlugRoute
   '/produto/$id': typeof ProdutoIdRoute
   '/conta/': typeof ContaIndexRoute
@@ -111,7 +125,9 @@ export interface FileRoutesByTo {
   '/carrinho': typeof CarrinhoRoute
   '/checkout': typeof CheckoutRoute
   '/contato': typeof ContatoRoute
+  '/esqueci-senha': typeof EsqueciSenhaRoute
   '/login': typeof LoginRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/categoria/$slug': typeof CategoriaSlugRoute
   '/produto/$id': typeof ProdutoIdRoute
   '/conta': typeof ContaIndexRoute
@@ -127,7 +143,9 @@ export interface FileRoutesById {
   '/checkout': typeof CheckoutRoute
   '/conta': typeof ContaRouteWithChildren
   '/contato': typeof ContatoRoute
+  '/esqueci-senha': typeof EsqueciSenhaRoute
   '/login': typeof LoginRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/categoria/$slug': typeof CategoriaSlugRoute
   '/produto/$id': typeof ProdutoIdRoute
   '/conta/': typeof ContaIndexRoute
@@ -144,7 +162,9 @@ export interface FileRouteTypes {
     | '/checkout'
     | '/conta'
     | '/contato'
+    | '/esqueci-senha'
     | '/login'
+    | '/reset-password'
     | '/categoria/$slug'
     | '/produto/$id'
     | '/conta/'
@@ -158,7 +178,9 @@ export interface FileRouteTypes {
     | '/carrinho'
     | '/checkout'
     | '/contato'
+    | '/esqueci-senha'
     | '/login'
+    | '/reset-password'
     | '/categoria/$slug'
     | '/produto/$id'
     | '/conta'
@@ -173,7 +195,9 @@ export interface FileRouteTypes {
     | '/checkout'
     | '/conta'
     | '/contato'
+    | '/esqueci-senha'
     | '/login'
+    | '/reset-password'
     | '/categoria/$slug'
     | '/produto/$id'
     | '/conta/'
@@ -189,18 +213,34 @@ export interface RootRouteChildren {
   CheckoutRoute: typeof CheckoutRoute
   ContaRoute: typeof ContaRouteWithChildren
   ContatoRoute: typeof ContatoRoute
+  EsqueciSenhaRoute: typeof EsqueciSenhaRoute
   LoginRoute: typeof LoginRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
   CategoriaSlugRoute: typeof CategoriaSlugRoute
   ProdutoIdRoute: typeof ProdutoIdRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/login': {
       id: '/login'
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/esqueci-senha': {
+      id: '/esqueci-senha'
+      path: '/esqueci-senha'
+      fullPath: '/esqueci-senha'
+      preLoaderRoute: typeof EsqueciSenhaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/contato': {
@@ -312,7 +352,9 @@ const rootRouteChildren: RootRouteChildren = {
   CheckoutRoute: CheckoutRoute,
   ContaRoute: ContaRouteWithChildren,
   ContatoRoute: ContatoRoute,
+  EsqueciSenhaRoute: EsqueciSenhaRoute,
   LoginRoute: LoginRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
   CategoriaSlugRoute: CategoriaSlugRoute,
   ProdutoIdRoute: ProdutoIdRoute,
 }
