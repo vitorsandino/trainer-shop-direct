@@ -50,6 +50,7 @@ export type Product = {
   name: string;
   category: Category; // legacy — categoria principal (compat)
   categories?: Category[]; // múltiplas categorias
+  collection?: string; // slug da coleção (ex: "escarlate-violeta")
   price: number;
   originalPrice?: number; // preço "de" (antes do desconto)
   description: string;
@@ -61,6 +62,29 @@ export type Product = {
   bannerBadge?: string;
   createdAt: number;
 };
+
+// ---- Coleções (TCG sets) ----
+export type CollectionDef = { value: string; label: string };
+
+const COLL_KEY = "pkmn_collections_v1";
+const DEFAULT_COLLECTIONS: CollectionDef[] = [
+  { value: "escarlate-violeta", label: "Escarlate & Violeta" },
+  { value: "151", label: "151" },
+  { value: "paldea-evolved", label: "Paldea Evoluída" },
+];
+
+export function getCollections(): CollectionDef[] {
+  if (typeof window === "undefined") return DEFAULT_COLLECTIONS;
+  const raw = localStorage.getItem(COLL_KEY);
+  if (!raw) { localStorage.setItem(COLL_KEY, JSON.stringify(DEFAULT_COLLECTIONS)); return DEFAULT_COLLECTIONS; }
+  try { return JSON.parse(raw); } catch { return DEFAULT_COLLECTIONS; }
+}
+const collListeners = new Set<() => void>();
+export function subscribeCollections(cb: () => void) { collListeners.add(cb); return () => collListeners.delete(cb); }
+export function saveCollections(list: CollectionDef[]) {
+  localStorage.setItem(COLL_KEY, JSON.stringify(list));
+  collListeners.forEach(cb => cb());
+}
 
 /** Retorna todas as categorias do produto (compat com category singular). */
 export function productCategories(p: Product): Category[] {

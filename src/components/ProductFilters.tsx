@@ -1,6 +1,6 @@
-import { CATEGORIES, type Category, type Product, productCategories } from "@/lib/products";
+import { CATEGORIES, type Category, type Product, productCategories, getCollections, subscribeCollections, type CollectionDef } from "@/lib/products";
 import { SlidersHorizontal, X } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 export type FilterState = {
   sort: "recent" | "asc" | "desc" | "name";
@@ -8,6 +8,7 @@ export type FilterState = {
   maxPrice: string;
   inStock: boolean;
   categories: Category[];
+  collections: string[];
 };
 
 export const defaultFilters: FilterState = {
@@ -16,6 +17,7 @@ export const defaultFilters: FilterState = {
   maxPrice: "",
   inStock: false,
   categories: [],
+  collections: [],
 };
 
 const PRICE_RANGES: { label: string; min: string; max: string }[] = [
@@ -32,6 +34,7 @@ export function applyFilters(products: Product[], f: FilterState, opts?: { locke
   return products
     .filter(p => (opts?.lockedCategory ? productCategories(p).includes(opts.lockedCategory) : true))
     .filter(p => (f.categories.length ? productCategories(p).some(c => f.categories.includes(c)) : true))
+    .filter(p => (f.collections.length ? (p.collection ? f.collections.includes(p.collection) : false) : true))
     .filter(p => p.price >= min && p.price <= max)
     .filter(p => (f.inStock ? (p.stock ?? 0) > 0 : true))
     .sort((a, b) => {
@@ -53,12 +56,18 @@ type Props = {
 
 export function ProductFilters({ value, onChange, showCategories, total }: Props) {
   const [openMobile, setOpenMobile] = useState(false);
+  const [collections, setCollections] = useState<CollectionDef[]>(() => (typeof window !== "undefined" ? getCollections() : []));
+  useEffect(() => {
+    const unsub = subscribeCollections(() => setCollections(getCollections()));
+    return () => { unsub; };
+  }, []);
   const activeCount = useMemo(() => {
     let n = 0;
     if (value.minPrice) n++;
     if (value.maxPrice) n++;
     if (value.inStock) n++;
     n += value.categories.length;
+    n += value.collections.length;
     return n;
   }, [value]);
 
@@ -68,6 +77,14 @@ export function ProductFilters({ value, onChange, showCategories, total }: Props
       categories: value.categories.includes(c)
         ? value.categories.filter(x => x !== c)
         : [...value.categories, c],
+    });
+  };
+  const toggleColl = (c: string) => {
+    onChange({
+      ...value,
+      collections: value.collections.includes(c)
+        ? value.collections.filter(x => x !== c)
+        : [...value.collections, c],
     });
   };
 
@@ -141,6 +158,24 @@ export function ProductFilters({ value, onChange, showCategories, total }: Props
                   type="checkbox"
                   checked={value.categories.includes(c.value)}
                   onChange={() => toggleCat(c.value)}
+                />
+                {c.label}
+              </label>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {collections.length > 0 && (
+        <div>
+          <h3 className="mb-2 text-xs font-bold uppercase tracking-widest text-secondary">Coleção</h3>
+          <div className="space-y-1.5">
+            {collections.map(c => (
+              <label key={c.value} className="flex cursor-pointer items-center gap-2 text-sm">
+                <input
+                  type="checkbox"
+                  checked={value.collections.includes(c.value)}
+                  onChange={() => toggleColl(c.value)}
                 />
                 {c.label}
               </label>
