@@ -152,6 +152,7 @@ export function FinanceTab() {
                 <th className="p-3">Lucro un.</th>
                 <th className="p-3">Lucro total</th>
                 <th className="p-3">Margem</th>
+                <th className="p-3">Tempo</th>
                 <th className="p-3">Status</th>
                 <th className="p-3 text-right">Ações</th>
               </tr>
