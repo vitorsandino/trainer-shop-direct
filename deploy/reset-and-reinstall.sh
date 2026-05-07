@@ -1,14 +1,12 @@
 #!/usr/bin/env bash
 # ============================================================
-# RESET TOTAL + reinstalação simples (SOMENTE estático via Nginx)
+# RESET TOTAL + reinstalação simples
 #
-# O que faz:
-#   1. Para e remove Apache, Nginx, PM2 (qualquer processo na 80/443/3000)
-#   2. Apaga TODA configuração antiga do Nginx e do Let's Encrypt
-#   3. Reinstala Nginx + Certbot limpos
-#   4. Faz git pull + build (gera dist/client estático)
-#   5. Configura Nginx servindo APENAS arquivos estáticos (sem proxy)
-#   6. Emite SSL novo via certbot --nginx
+# Arquitetura final:
+#   Internet -> Nginx (80/443, SSL) -> Node/Miniflare (127.0.0.1:3000)
+#   - Nginx faz proxy_pass e SSL (certbot)
+#   - PM2 mantém o Worker (dist/server) rodando via Miniflare
+#   - Miniflare serve também os assets de dist/client
 #
 # Uso:
 #   sudo bash deploy/reset-and-reinstall.sh
@@ -19,28 +17,27 @@ DOMAIN="${DOMAIN:-pandexstore.com.br}"
 APP_NAME="${APP_NAME:-trainer-shop-direct}"
 APP_DIR="/var/www/${APP_NAME}"
 EMAIL="${EMAIL:-admin@${DOMAIN}}"
+PORT="${PORT:-3000}"
 
-echo "==> [1/7] Matando qualquer processo nas portas 80/443/3000"
+echo "==> [1/8] Parando tudo nas portas 80/443/${PORT}"
 systemctl stop nginx 2>/dev/null || true
 systemctl stop apache2 2>/dev/null || true
 systemctl disable apache2 2>/dev/null || true
 apt purge -y apache2 apache2-bin apache2-data apache2-utils 2>/dev/null || true
 
-# mata PM2 se existir (não usamos mais)
 if command -v pm2 >/dev/null 2>&1; then
   pm2 delete all 2>/dev/null || true
   pm2 kill 2>/dev/null || true
 fi
-
-# qualquer processo node sobrando
 pkill -9 -f "node" 2>/dev/null || true
+pkill -9 -f "workerd" 2>/dev/null || true
 
-echo "==> [2/7] Removendo Nginx e configurações antigas"
+echo "==> [2/8] Removendo Nginx + configs antigas"
 apt purge -y nginx nginx-common nginx-full nginx-core 2>/dev/null || true
 apt autoremove -y
 rm -rf /etc/nginx /var/log/nginx /var/lib/nginx
 
-echo "==> [3/7] Removendo certificados Let's Encrypt antigos"
+echo "==> [3/8] Removendo certificados Let's Encrypt antigos"
 if command -v certbot >/dev/null 2>&1; then
   for cert in $(certbot certificates 2>/dev/null | awk '/Certificate Name:/ {print $3}'); do
     certbot delete --cert-name "$cert" --non-interactive || true
@@ -48,91 +45,103 @@ if command -v certbot >/dev/null 2>&1; then
 fi
 rm -rf /etc/letsencrypt /var/lib/letsencrypt /var/log/letsencrypt
 
-echo "==> [4/7] Reinstalando Nginx + Certbot"
+echo "==> [4/8] Instalando Nginx, Certbot, Node 20, Bun, PM2"
 apt update
-apt install -y nginx certbot python3-certbot-nginx curl git
+apt install -y nginx certbot python3-certbot-nginx curl git ca-certificates
 
-echo "==> [5/7] Atualizando código e fazendo build"
-if [ ! -d "${APP_DIR}/.git" ]; then
-  echo "ERRO: ${APP_DIR} não existe ou não é um repo git."
-  echo "  Clone primeiro:  git clone <repo> ${APP_DIR}"
-  exit 1
+if ! command -v node >/dev/null 2>&1; then
+  curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
+  apt install -y nodejs
 fi
-
-cd "${APP_DIR}"
-
-# garante bun
 if ! command -v bun >/dev/null 2>&1; then
   curl -fsSL https://bun.sh/install | bash
   ln -sf /root/.bun/bin/bun /usr/local/bin/bun
 fi
+if ! command -v pm2 >/dev/null 2>&1; then
+  npm install -g pm2
+fi
 
-git pull --ff-only || git fetch --all && git reset --hard origin/HEAD
+echo "==> [5/8] Atualizando código e fazendo build"
+if [ ! -d "${APP_DIR}/.git" ]; then
+  echo "ERRO: ${APP_DIR} não é um repo git. Clone primeiro."
+  exit 1
+fi
+cd "${APP_DIR}"
+git fetch --all
+git reset --hard origin/HEAD
 bun install
+# instala miniflare 4 fora do package.json (runtime de produção)
+npm install --no-save --prefix "${APP_DIR}" miniflare@^4
 bun run build
 
-if [ ! -d "${APP_DIR}/dist/client" ]; then
-  echo "ERRO: build não gerou ${APP_DIR}/dist/client"
-  ls -la "${APP_DIR}/dist" 2>/dev/null || true
+if [ ! -f "${APP_DIR}/dist/server/index.js" ]; then
+  echo "ERRO: build não gerou dist/server/index.js"
   exit 1
 fi
 
-# permissão pro nginx ler
-chown -R www-data:www-data "${APP_DIR}/dist"
-chmod -R a+rX "${APP_DIR}/dist"
-# nginx precisa atravessar /var/www/${APP_NAME}
-chmod a+x /var/www "${APP_DIR}" || true
+echo "==> [6/8] Iniciando Worker via PM2 em 127.0.0.1:${PORT}"
+pm2 delete "${APP_NAME}" >/dev/null 2>&1 || true
+PORT=${PORT} HOST=127.0.0.1 pm2 start "${APP_DIR}/deploy/server.mjs" \
+  --name "${APP_NAME}" \
+  --interpreter node \
+  --update-env
+pm2 save
+pm2 startup systemd -u root --hp /root >/dev/null || true
 
-echo "==> [6/7] Escrevendo Nginx site (estático puro, SEM proxy)"
+# espera subir
+echo "   aguardando porta ${PORT}…"
+for i in $(seq 1 30); do
+  if ss -tln | grep -q "127.0.0.1:${PORT} "; then break; fi
+  sleep 1
+done
+if ! ss -tln | grep -q "127.0.0.1:${PORT} "; then
+  echo "AVISO: app não subiu em ${PORT}. Veja logs: pm2 logs ${APP_NAME}"
+fi
+
+echo "==> [7/8] Configurando Nginx (proxy reverso)"
 rm -f /etc/nginx/sites-enabled/default /etc/nginx/sites-available/default
-
 cat > /etc/nginx/sites-available/${APP_NAME} <<NGINX
 server {
     listen 80 default_server;
     listen [::]:80 default_server;
     server_name ${DOMAIN} www.${DOMAIN};
 
-    root ${APP_DIR}/dist/client;
-    index index.html;
-
     client_max_body_size 25m;
 
-    # cache longo para assets versionados
-    location /assets/ {
-        expires 1y;
-        add_header Cache-Control "public, immutable";
-        try_files \$uri =404;
-    }
-
-    # SPA fallback
     location / {
-        try_files \$uri \$uri/ /index.html;
+        proxy_pass http://127.0.0.1:${PORT};
+        proxy_http_version 1.1;
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto \$scheme;
+        proxy_set_header Upgrade \$http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_read_timeout 60s;
     }
 }
 NGINX
-
 ln -sf /etc/nginx/sites-available/${APP_NAME} /etc/nginx/sites-enabled/${APP_NAME}
-
 nginx -t
 systemctl enable nginx
 systemctl restart nginx
 
-# firewall: libera 80/443 (não derruba SSH)
 if command -v ufw >/dev/null 2>&1; then
   ufw allow OpenSSH 2>/dev/null || true
   ufw allow 'Nginx Full' 2>/dev/null || true
 fi
 
-echo "==> [7/7] Emitindo certificado SSL para ${DOMAIN} e www.${DOMAIN}"
+echo "==> [8/8] Emitindo SSL para ${DOMAIN} e www.${DOMAIN}"
 certbot --nginx \
   -d "${DOMAIN}" -d "www.${DOMAIN}" \
   --non-interactive --agree-tos -m "${EMAIL}" --redirect \
-  || echo "AVISO: certbot falhou. Confirme que o DNS A de ${DOMAIN} e www aponta para este servidor e rode novamente:
+  || echo "AVISO: certbot falhou. Confirme DNS e rode:
   certbot --nginx -d ${DOMAIN} -d www.${DOMAIN} --agree-tos -m ${EMAIL} --redirect"
 
 echo ""
 echo "==================================================="
-echo " ✅ Pronto. Acesse: https://${DOMAIN}"
-echo "    Logs nginx:  tail -f /var/log/nginx/error.log"
-echo "    Atualizar:   sudo bash ${APP_DIR}/deploy/update.sh"
+echo " ✅ Pronto: https://${DOMAIN}"
+echo " Logs app:    pm2 logs ${APP_NAME}"
+echo " Logs nginx:  tail -f /var/log/nginx/error.log"
+echo " Atualizar:   sudo bash ${APP_DIR}/deploy/update.sh"
 echo "==================================================="
