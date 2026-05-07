@@ -131,7 +131,10 @@ function ProductsTab() {
   const [q, setQ] = useState("");
 
   const refresh = () => setProducts(getProducts());
-  useEffect(() => { refresh(); }, []);
+  useEffect(() => {
+    refresh();
+    return subscribeProducts(refresh);
+  }, []);
 
   const cats = useGetCategories();
 
@@ -414,9 +417,17 @@ function CollectionsTab() {
 
 function AnalyticsTab() {
   const [data, setData] = useState(() => getAnalytics());
-  const products = useMemo(() => getProducts(), []);
+  const [products, setProducts] = useState(() => getProducts());
 
   const refresh = () => setData(getAnalytics());
+  useEffect(() => {
+    const unsubAnalytics = subscribeAnalytics(refresh);
+    const unsubProducts = subscribeProducts(() => setProducts(getProducts()));
+    return () => {
+      unsubAnalytics();
+      unsubProducts();
+    };
+  }, []);
 
   const topPages = Object.entries(data.pageViews).sort((a, b) => b[1] - a[1]).slice(0, 8);
   const topProducts = Object.entries(data.productViews).sort((a, b) => b[1] - a[1]).slice(0, 8);

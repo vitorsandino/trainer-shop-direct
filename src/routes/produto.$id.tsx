@@ -1,7 +1,7 @@
 import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState, useCallback } from "react";
 import { ChevronLeft, ChevronRight, X, ZoomIn, ShoppingCart, Minus, Plus } from "lucide-react";
-import { getProduct, type Product, formatPrice, whatsappLink, CATEGORIES, trackProductView, trackProductClick, productCategories, discountPercent } from "@/lib/products";
+import { getProduct, subscribeProducts, type Product, formatPrice, whatsappLink, CATEGORIES, trackProductView, trackProductClick, productCategories, discountPercent } from "@/lib/products";
 import { addToCart } from "@/lib/cart";
 
 export const Route = createFileRoute("/produto/$id")({
@@ -17,9 +17,15 @@ function ProductPage() {
   const [qty, setQty] = useState(1);
 
   useEffect(() => {
+    const refresh = () => {
+      const p = getProduct(id);
+      setProduct(p ?? null);
+    };
+    refresh();
+    const unsub = subscribeProducts(refresh);
     const p = getProduct(id);
-    setProduct(p ?? null);
     if (p) trackProductView(p.id);
+    return unsub;
   }, [id]);
 
   const next = useCallback(() => {
