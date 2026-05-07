@@ -62,8 +62,8 @@ if [ ! -d "${APP_DIR}/dist/server/assets" ] || [ ! -d "${APP_DIR}/dist/client" ]
 fi
 
 echo "==> Instalando Miniflare (runtime workerd em Node) p/ servir o worker"
-# instala localmente no projeto sem mexer no package.json
-npm install --no-save --prefix "${APP_DIR}" miniflare@3
+# usa a mesma major compatível com o plugin/build do projeto
+npm install --no-save --prefix "${APP_DIR}" miniflare@^4
 
 ENTRY="${APP_DIR}/deploy/server.mjs"
 echo "==> Entry: ${ENTRY}"
