@@ -9,12 +9,39 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as ContaRouteImport } from './routes/conta'
+import { Route as CheckoutRouteImport } from './routes/checkout'
+import { Route as CarrinhoRouteImport } from './routes/carrinho'
 import { Route as BuscarRouteImport } from './routes/buscar'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ContaIndexRouteImport } from './routes/conta.index'
 import { Route as ProdutoIdRouteImport } from './routes/produto.$id'
 import { Route as CategoriaSlugRouteImport } from './routes/categoria.$slug'
+import { Route as ContaPedidosIndexRouteImport } from './routes/conta.pedidos.index'
+import { Route as ContaPedidosIdRouteImport } from './routes/conta.pedidos.$id'
 
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContaRoute = ContaRouteImport.update({
+  id: '/conta',
+  path: '/conta',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CheckoutRoute = CheckoutRouteImport.update({
+  id: '/checkout',
+  path: '/checkout',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CarrinhoRoute = CarrinhoRouteImport.update({
+  id: '/carrinho',
+  path: '/carrinho',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const BuscarRoute = BuscarRouteImport.update({
   id: '/buscar',
   path: '/buscar',
@@ -30,6 +57,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ContaIndexRoute = ContaIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => ContaRoute,
+} as any)
 const ProdutoIdRoute = ProdutoIdRouteImport.update({
   id: '/produto/$id',
   path: '/produto/$id',
@@ -40,53 +72,145 @@ const CategoriaSlugRoute = CategoriaSlugRouteImport.update({
   path: '/categoria/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ContaPedidosIndexRoute = ContaPedidosIndexRouteImport.update({
+  id: '/pedidos/',
+  path: '/pedidos/',
+  getParentRoute: () => ContaRoute,
+} as any)
+const ContaPedidosIdRoute = ContaPedidosIdRouteImport.update({
+  id: '/pedidos/$id',
+  path: '/pedidos/$id',
+  getParentRoute: () => ContaRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/buscar': typeof BuscarRoute
+  '/carrinho': typeof CarrinhoRoute
+  '/checkout': typeof CheckoutRoute
+  '/conta': typeof ContaRouteWithChildren
+  '/login': typeof LoginRoute
   '/categoria/$slug': typeof CategoriaSlugRoute
   '/produto/$id': typeof ProdutoIdRoute
+  '/conta/': typeof ContaIndexRoute
+  '/conta/pedidos/$id': typeof ContaPedidosIdRoute
+  '/conta/pedidos/': typeof ContaPedidosIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/buscar': typeof BuscarRoute
+  '/carrinho': typeof CarrinhoRoute
+  '/checkout': typeof CheckoutRoute
+  '/login': typeof LoginRoute
   '/categoria/$slug': typeof CategoriaSlugRoute
   '/produto/$id': typeof ProdutoIdRoute
+  '/conta': typeof ContaIndexRoute
+  '/conta/pedidos/$id': typeof ContaPedidosIdRoute
+  '/conta/pedidos': typeof ContaPedidosIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/buscar': typeof BuscarRoute
+  '/carrinho': typeof CarrinhoRoute
+  '/checkout': typeof CheckoutRoute
+  '/conta': typeof ContaRouteWithChildren
+  '/login': typeof LoginRoute
   '/categoria/$slug': typeof CategoriaSlugRoute
   '/produto/$id': typeof ProdutoIdRoute
+  '/conta/': typeof ContaIndexRoute
+  '/conta/pedidos/$id': typeof ContaPedidosIdRoute
+  '/conta/pedidos/': typeof ContaPedidosIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/admin' | '/buscar' | '/categoria/$slug' | '/produto/$id'
+  fullPaths:
+    | '/'
+    | '/admin'
+    | '/buscar'
+    | '/carrinho'
+    | '/checkout'
+    | '/conta'
+    | '/login'
+    | '/categoria/$slug'
+    | '/produto/$id'
+    | '/conta/'
+    | '/conta/pedidos/$id'
+    | '/conta/pedidos/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/admin' | '/buscar' | '/categoria/$slug' | '/produto/$id'
+  to:
+    | '/'
+    | '/admin'
+    | '/buscar'
+    | '/carrinho'
+    | '/checkout'
+    | '/login'
+    | '/categoria/$slug'
+    | '/produto/$id'
+    | '/conta'
+    | '/conta/pedidos/$id'
+    | '/conta/pedidos'
   id:
     | '__root__'
     | '/'
     | '/admin'
     | '/buscar'
+    | '/carrinho'
+    | '/checkout'
+    | '/conta'
+    | '/login'
     | '/categoria/$slug'
     | '/produto/$id'
+    | '/conta/'
+    | '/conta/pedidos/$id'
+    | '/conta/pedidos/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRoute
   BuscarRoute: typeof BuscarRoute
+  CarrinhoRoute: typeof CarrinhoRoute
+  CheckoutRoute: typeof CheckoutRoute
+  ContaRoute: typeof ContaRouteWithChildren
+  LoginRoute: typeof LoginRoute
   CategoriaSlugRoute: typeof CategoriaSlugRoute
   ProdutoIdRoute: typeof ProdutoIdRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/conta': {
+      id: '/conta'
+      path: '/conta'
+      fullPath: '/conta'
+      preLoaderRoute: typeof ContaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/checkout': {
+      id: '/checkout'
+      path: '/checkout'
+      fullPath: '/checkout'
+      preLoaderRoute: typeof CheckoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/carrinho': {
+      id: '/carrinho'
+      path: '/carrinho'
+      fullPath: '/carrinho'
+      preLoaderRoute: typeof CarrinhoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/buscar': {
       id: '/buscar'
       path: '/buscar'
@@ -108,6 +232,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/conta/': {
+      id: '/conta/'
+      path: '/'
+      fullPath: '/conta/'
+      preLoaderRoute: typeof ContaIndexRouteImport
+      parentRoute: typeof ContaRoute
+    }
     '/produto/$id': {
       id: '/produto/$id'
       path: '/produto/$id'
@@ -122,13 +253,45 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CategoriaSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/conta/pedidos/': {
+      id: '/conta/pedidos/'
+      path: '/pedidos'
+      fullPath: '/conta/pedidos/'
+      preLoaderRoute: typeof ContaPedidosIndexRouteImport
+      parentRoute: typeof ContaRoute
+    }
+    '/conta/pedidos/$id': {
+      id: '/conta/pedidos/$id'
+      path: '/pedidos/$id'
+      fullPath: '/conta/pedidos/$id'
+      preLoaderRoute: typeof ContaPedidosIdRouteImport
+      parentRoute: typeof ContaRoute
+    }
   }
 }
+
+interface ContaRouteChildren {
+  ContaIndexRoute: typeof ContaIndexRoute
+  ContaPedidosIdRoute: typeof ContaPedidosIdRoute
+  ContaPedidosIndexRoute: typeof ContaPedidosIndexRoute
+}
+
+const ContaRouteChildren: ContaRouteChildren = {
+  ContaIndexRoute: ContaIndexRoute,
+  ContaPedidosIdRoute: ContaPedidosIdRoute,
+  ContaPedidosIndexRoute: ContaPedidosIndexRoute,
+}
+
+const ContaRouteWithChildren = ContaRoute._addFileChildren(ContaRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRoute,
   BuscarRoute: BuscarRoute,
+  CarrinhoRoute: CarrinhoRoute,
+  CheckoutRoute: CheckoutRoute,
+  ContaRoute: ContaRouteWithChildren,
+  LoginRoute: LoginRoute,
   CategoriaSlugRoute: CategoriaSlugRoute,
   ProdutoIdRoute: ProdutoIdRoute,
 }
