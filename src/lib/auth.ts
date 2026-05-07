@@ -1,5 +1,3 @@
-import { getSupabase } from "@/lib/supabase-client";
-
 export type User = {
   id: string;
   name: string;
@@ -8,37 +6,20 @@ export type User = {
   createdAt: number;
 };
 
-type LegacyUser = User & { passHash: string };
+type StoredUser = User & { passHash: string };
 
-const LEGACY_USERS_KEY = "pkmn_users_v1";
-const LEGACY_SESSION_KEY = "pkmn_session_v1";
+type SessionSnapshot = { id?: string; email?: string };
+
+const USERS_KEY = "pkmn_users_v1";
+const SESSION_KEY = "pkmn_session_v1";
 const listeners = new Set<() => void>();
 
 let authListenerInstalled = false;
 let hydrated = false;
 let currentUser: User | null = null;
-let hydratePromise: Promise<User | null> | null = null;
 
 function emit() {
   listeners.forEach((cb) => cb());
-}
-
-function normalizeUser(raw: any): User | null {
-  if (!raw?.id || !raw?.email) return null;
-  const name = typeof raw.user_metadata?.name === "string" && raw.user_metadata.name.trim()
-    ? raw.user_metadata.name.trim()
-    : String(raw.email).split("@")[0];
-  const phone = typeof raw.user_metadata?.phone === "string" && raw.user_metadata.phone.trim()
-    ? raw.user_metadata.phone.trim()
-    : undefined;
-
-  return {
-    id: raw.id,
-    name,
-    email: String(raw.email).trim().toLowerCase(),
-    phone,
-    createdAt: raw.created_at ? new Date(raw.created_at).getTime() : Date.now(),
-  };
 }
 
 async function sha256(s: string) {
@@ -47,121 +28,115 @@ async function sha256(s: string) {
   return Array.from(new Uint8Array(hash)).map((b) => b.toString(16).padStart(2, "0")).join("");
 }
 
-function getLegacyUsers(): LegacyUser[] {
-  if (typeof window === "undefined") return [];
-  try { return JSON.parse(localStorage.getItem(LEGACY_USERS_KEY) || "[]"); } catch { return []; }
-}
-
-function saveLegacyUsers(list: LegacyUser[]) {
-  if (typeof window === "undefined") return;
-  if (list.length === 0) localStorage.removeItem(LEGACY_USERS_KEY);
-  else localStorage.setItem(LEGACY_USERS_KEY, JSON.stringify(list));
-}
-
-function clearLegacySession() {
-  if (typeof window === "undefined") return;
-  localStorage.removeItem(LEGACY_SESSION_KEY);
-}
-
-function removeLegacyUser(email: string) {
-  const next = getLegacyUsers().filter((user) => user.email !== email);
-  saveLegacyUsers(next);
-  clearLegacySession();
-}
-
 function authErrorMessage(message?: string) {
   const text = (message || "").toLowerCase();
-  if (text.includes("invalid login credentials")) return "E-mail ou senha inválidos";
-  if (text.includes("email not confirmed")) return "Confirme seu e-mail antes de entrar";
-  if (text.includes("user already registered")) return "Este e-mail já está cadastrado";
-  if (text.includes("password should be at least")) return "A senha precisa ter pelo menos 6 caracteres";
+  if (text.includes("already") || text.includes("registered") || text.includes("exists")) return "Este e-mail já está cadastrado";
+  if (text.includes("invalid") || text.includes("credentials")) return "E-mail ou senha inválidos";
+  if (text.includes("least 6") || text.includes("mínimo")) return "A senha precisa ter pelo menos 6 caracteres";
   return message || "Não foi possível autenticar agora";
 }
 
-async function hydrateCurrentUser(force = false): Promise<User | null> {
+function getStoredUsers(): StoredUser[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = localStorage.getItem(USERS_KEY);
+    const parsed = raw ? JSON.parse(raw) : [];
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveStoredUsers(list: StoredUser[]) {
+  if (typeof window === "undefined") return;
+  if (list.length === 0) localStorage.removeItem(USERS_KEY);
+  else localStorage.setItem(USERS_KEY, JSON.stringify(list));
+}
+
+function readSessionSnapshot(): SessionSnapshot | null {
   if (typeof window === "undefined") return null;
-  if (hydratePromise && !force) return hydratePromise;
+  const raw = localStorage.getItem(SESSION_KEY);
+  if (!raw) return null;
 
-  hydratePromise = (async () => {
-    const supabase = await getSupabase();
-    if (!supabase) {
-      hydrated = true;
-      currentUser = null;
-      emit();
-      return null;
+  try {
+    const parsed = JSON.parse(raw);
+    if (parsed && typeof parsed === "object") {
+      return {
+        id: typeof parsed.id === "string" ? parsed.id : undefined,
+        email: typeof parsed.email === "string" ? parsed.email.toLowerCase() : undefined,
+      };
     }
+  } catch {
+    if (raw.includes("@")) return { email: raw.trim().toLowerCase() };
+    return { id: raw.trim() };
+  }
 
-    const { data, error } = await supabase.auth.getUser();
-    if (error) {
-      currentUser = null;
-    } else {
-      currentUser = normalizeUser(data.user);
-    }
+  return null;
+}
+
+function persistSession(user: User) {
+  if (typeof window === "undefined") return;
+  localStorage.setItem(SESSION_KEY, JSON.stringify({ id: user.id, email: user.email }));
+}
+
+function clearSession() {
+  if (typeof window === "undefined") return;
+  localStorage.removeItem(SESSION_KEY);
+}
+
+function toPublicUser(user: StoredUser): User {
+  const { passHash: _passHash, ...safeUser } = user;
+  return safeUser;
+}
+
+function hydrateFromStorage(): User | null {
+  if (typeof window === "undefined") return null;
+
+  const session = readSessionSnapshot();
+  if (!session) {
     hydrated = true;
-    if (currentUser) clearLegacySession();
-    emit();
-    return currentUser;
-  })().finally(() => {
-    hydratePromise = null;
+    currentUser = null;
+    return null;
+  }
+
+  const stored = getStoredUsers();
+  const match = stored.find((user) => {
+    if (session.id && user.id === session.id) return true;
+    if (session.email && user.email === session.email) return true;
+    return false;
   });
 
-  return hydratePromise;
+  if (!match) {
+    clearSession();
+    hydrated = true;
+    currentUser = null;
+    return null;
+  }
+
+  currentUser = toPublicUser(match);
+  hydrated = true;
+  return currentUser;
 }
 
 function ensureAuthListener() {
-  if (typeof window === "undefined" || authListenerInstalled) return;
-  authListenerInstalled = true;
+  if (typeof window === "undefined") return;
 
-  void hydrateCurrentUser();
-  void getSupabase().then((supabase) => {
-    if (!supabase) return;
-    supabase.auth.onAuthStateChange((_event, session) => {
-      currentUser = normalizeUser(session?.user ?? null);
-      hydrated = true;
-      if (currentUser) clearLegacySession();
+  if (!authListenerInstalled) {
+    authListenerInstalled = true;
+    window.addEventListener("storage", (event) => {
+      if (event.storageArea !== window.localStorage) return;
+      if (event.key && event.key !== USERS_KEY && event.key !== SESSION_KEY) return;
+      hydrateFromStorage();
       emit();
     });
-  });
-
-  window.addEventListener("focus", () => {
-    void hydrateCurrentUser(true);
-  });
-}
-
-async function migrateLegacyUser(email: string, password: string) {
-  const legacyUser = getLegacyUsers().find((user) => user.email === email);
-  if (!legacyUser) return null;
-  const passHash = await sha256(password);
-  if (passHash !== legacyUser.passHash) return null;
-
-  const supabase = await getSupabase();
-  if (!supabase) throw new Error("Supabase não configurado");
-
-  const { data, error } = await supabase.auth.signUp({
-    email,
-    password,
-    options: {
-      data: {
-        name: legacyUser.name,
-        phone: legacyUser.phone ?? "",
-      },
-    },
-  });
-
-  if (error) throw new Error(authErrorMessage(error.message));
-
-  if (!data.session) {
-    const loginResult = await supabase.auth.signInWithPassword({ email, password });
-    if (loginResult.error) throw new Error(authErrorMessage(loginResult.error.message));
-    currentUser = normalizeUser(loginResult.data.user);
-  } else {
-    currentUser = normalizeUser(data.user);
   }
 
-  hydrated = true;
-  removeLegacyUser(email);
-  emit();
-  return currentUser;
+  if (!hydrated) hydrateFromStorage();
+}
+
+function findStoredUserByEmail(email: string) {
+  const normalizedEmail = email.trim().toLowerCase();
+  return getStoredUsers().find((user) => user.email === normalizedEmail) ?? null;
 }
 
 export function subscribeAuth(cb: () => void) {
@@ -184,45 +159,54 @@ export function getCurrentUser(): User | null | undefined {
 
 export async function register(input: { name: string; email: string; phone?: string; password: string }) {
   ensureAuthListener();
+
   const email = input.email.trim().toLowerCase();
   const name = input.name.trim();
   const phone = input.phone?.trim() || undefined;
+  const password = input.password;
 
-  if (!email || !input.password || !name) throw new Error("Preencha todos os campos");
+  if (!email || !name || !password) throw new Error("Preencha todos os campos");
+  if (password.length < 6) throw new Error("A senha precisa ter pelo menos 6 caracteres");
+  if (findStoredUserByEmail(email)) throw new Error("Este e-mail já está cadastrado");
 
-  // Cria o usuário no servidor (já confirmado, sem e-mail do Supabase) e envia welcome via SMTP
-  const { registerUserServer } = await import("@/lib/email.functions");
-  await registerUserServer({ data: { email, password: input.password, name, phone } });
+  const newUser: StoredUser = {
+    id: crypto.randomUUID(),
+    name,
+    email,
+    phone,
+    createdAt: Date.now(),
+    passHash: await sha256(password),
+  };
 
-  const supabase = await getSupabase();
-  if (!supabase) throw new Error("Supabase não configurado");
-
-  const loginResult = await supabase.auth.signInWithPassword({ email, password: input.password });
-  if (loginResult.error) throw new Error(authErrorMessage(loginResult.error.message));
-  currentUser = normalizeUser(loginResult.data.user);
-
+  saveStoredUsers([newUser, ...getStoredUsers()]);
+  currentUser = toPublicUser(newUser);
   hydrated = true;
-  removeLegacyUser(email);
+  persistSession(currentUser);
   emit();
+
+  try {
+    const { sendWelcomeEmail } = await import("@/lib/email.functions");
+    await sendWelcomeEmail({ data: { email, name } });
+  } catch (error) {
+    console.warn("[email] welcome falhou:", error);
+  }
+
   return currentUser;
 }
 
 export async function login(email: string, password: string) {
   ensureAuthListener();
+
   const normalizedEmail = email.trim().toLowerCase();
-  const supabase = await getSupabase();
-  if (!supabase) throw new Error("Supabase não configurado");
+  const storedUser = findStoredUserByEmail(normalizedEmail);
+  if (!storedUser) throw new Error("E-mail ou senha inválidos");
 
-  const { data, error } = await supabase.auth.signInWithPassword({ email: normalizedEmail, password });
-  if (error) {
-    const migratedUser = await migrateLegacyUser(normalizedEmail, password);
-    if (migratedUser) return migratedUser;
-    throw new Error(authErrorMessage(error.message));
-  }
+  const passHash = await sha256(password);
+  if (passHash !== storedUser.passHash) throw new Error("E-mail ou senha inválidos");
 
-  currentUser = normalizeUser(data.user);
+  currentUser = toPublicUser(storedUser);
   hydrated = true;
-  clearLegacySession();
+  persistSession(currentUser);
   emit();
   return currentUser;
 }
@@ -230,34 +214,67 @@ export async function login(email: string, password: string) {
 export function logout() {
   hydrated = true;
   currentUser = null;
-  clearLegacySession();
+  clearSession();
   emit();
-  void getSupabase().then((supabase) => supabase?.auth.signOut());
 }
 
 export async function updateProfile(patch: Partial<Pick<User, "name" | "phone">>) {
   ensureAuthListener();
-  const supabase = await getSupabase();
-  if (!supabase) throw new Error("Supabase não configurado");
+  if (!currentUser) throw new Error("Sessão inválida");
 
-  const { data: userData, error: userError } = await supabase.auth.getUser();
-  if (userError || !userData.user) throw new Error("Sessão inválida");
+  const nextName = patch.name?.trim() || currentUser.name;
+  const nextPhone = patch.phone?.trim() || undefined;
+  let updatedUser: StoredUser | null = null;
 
-  const currentMeta = userData.user.user_metadata ?? {};
-  const nextName = patch.name?.trim() || currentMeta.name || currentUser?.name || "";
-  const nextPhone = patch.phone?.trim() || "";
-
-  const { data, error } = await supabase.auth.updateUser({
-    data: {
-      ...currentMeta,
+  const nextUsers = getStoredUsers().map((user) => {
+    if (user.id !== currentUser?.id) return user;
+    updatedUser = {
+      ...user,
       name: nextName,
       phone: nextPhone,
-    },
+    };
+    return updatedUser;
   });
 
-  if (error) throw new Error(authErrorMessage(error.message));
+  if (!updatedUser) throw new Error("Usuário não encontrado");
 
-  currentUser = normalizeUser(data.user);
+  saveStoredUsers(nextUsers);
+  currentUser = toPublicUser(updatedUser);
   hydrated = true;
+  persistSession(currentUser);
   emit();
+  return currentUser;
 }
+
+export async function resetPasswordByEmail(email: string, newPassword: string) {
+  ensureAuthListener();
+
+  const normalizedEmail = email.trim().toLowerCase();
+  if (newPassword.trim().length < 6) throw new Error("A senha precisa ter pelo menos 6 caracteres");
+
+  const users = getStoredUsers();
+  if (!users.some((user) => user.email === normalizedEmail)) {
+    throw new Error("Não encontramos uma conta salva neste navegador para esse e-mail");
+  }
+
+  const nextHash = await sha256(newPassword);
+  let updatedCurrent: StoredUser | null = null;
+  const nextUsers = users.map((user) => {
+    if (user.email !== normalizedEmail) return user;
+    const updated = { ...user, passHash: nextHash };
+    if (currentUser?.id === updated.id) updatedCurrent = updated;
+    return updated;
+  });
+
+  saveStoredUsers(nextUsers);
+
+  if (updatedCurrent) {
+    currentUser = toPublicUser(updatedCurrent);
+    persistSession(currentUser);
+    emit();
+  }
+
+  return { ok: true };
+}
+
+export { authErrorMessage };
