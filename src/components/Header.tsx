@@ -112,17 +112,8 @@ export function Header() {
             </form>
             <Link to="/" onClick={() => setOpen(false)} className="block rounded-md bg-muted px-3 py-2 text-sm font-semibold">Início</Link>
             <div className="grid grid-cols-2 gap-2">
-              {CATEGORIES.map(c => (
-                <Link
-                  key={c.value}
-                  to="/categoria/$slug"
-                  params={{ slug: c.value }}
-                  onClick={() => setOpen(false)}
-                  className="rounded-md bg-muted px-3 py-2 text-sm"
-                >
-                  {c.label}
-                </Link>
-              ))}
+              <Link to="/categoria/$slug" params={{ slug: "booster" }} onClick={() => setOpen(false)} className="rounded-md bg-muted px-3 py-2 text-sm">Boosters</Link>
+              <Link to="/categoria/$slug" params={{ slug: "avulsas" }} onClick={() => setOpen(false)} className="rounded-md bg-muted px-3 py-2 text-sm">Cartas</Link>
             </div>
           </div>
         </div>
