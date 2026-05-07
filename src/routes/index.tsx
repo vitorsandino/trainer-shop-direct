@@ -97,7 +97,7 @@ function Index() {
               Ver tudo →
             </Link>
           </div>
-          <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
+          <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
             {featured.map(p => <ProductCard key={p.id} product={p} />)}
           </div>
         </section>
@@ -110,7 +110,7 @@ function Index() {
             <p className="text-xs font-bold uppercase tracking-widest text-primary">Novidades</p>
             <h2 className="font-display text-2xl md:text-3xl">Acabou de chegar</h2>
           </div>
-          <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
+          <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
             {latest.map(p => <ProductCard key={p.id} product={p} />)}
           </div>
         </section>
