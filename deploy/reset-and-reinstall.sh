@@ -139,12 +139,12 @@ if command -v ufw >/dev/null 2>&1; then
   ufw allow 'Nginx Full' 2>/dev/null || true
 fi
 
-echo "==> [8/8] Emitindo SSL para ${DOMAIN}"
+echo "==> [8/8] Emitindo SSL para ${DOMAIN} e www.${DOMAIN}"
 certbot --nginx \
-  -d "${DOMAIN}" \
-  --non-interactive --agree-tos -m "${EMAIL}" --redirect \
-  || echo "AVISO: certbot falhou. Confirme DNS e rode:
-  certbot --nginx -d ${DOMAIN} --agree-tos -m ${EMAIL} --redirect"
+  -d "${DOMAIN}" -d "www.${DOMAIN}" \
+  --expand --non-interactive --agree-tos -m "${EMAIL}" --redirect \
+  || echo "AVISO: certbot falhou. Confirme DNS (A record do www -> IP do servidor) e rode:
+  certbot --nginx -d ${DOMAIN} -d www.${DOMAIN} --expand --agree-tos -m ${EMAIL} --redirect"
 
 echo ""
 echo "==================================================="
