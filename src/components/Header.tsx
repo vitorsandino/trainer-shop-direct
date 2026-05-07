@@ -1,7 +1,7 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
-import { Search, Menu, X, Instagram, Facebook, Youtube, ShoppingCart, User } from "lucide-react";
+import { Search, Menu, X, Instagram, Facebook, Youtube, ShoppingCart, User, ChevronDown } from "lucide-react";
 import { useState } from "react";
-import { CATEGORIES, WHATSAPP_NUMBER } from "@/lib/products";
+import { CATEGORIES, WHATSAPP_NUMBER, getCategories } from "@/lib/products";
 import logo from "@/assets/pandex-logo.png";
 
 export function Header() {
