@@ -116,3 +116,24 @@ export function getOrdersByUser(userId: string): Order[] {
 export function getOrder(id: string): Order | undefined {
   return getOrders().find(o => o.id === id);
 }
+
+export function migrateOrdersToUser(userId: string, email: string) {
+  const normalizedEmail = email.trim().toLowerCase();
+  const list = getOrders();
+  let changed = false;
+
+  const next = list.map((order) => {
+    if (order.userId === userId) return order;
+    if (order.userEmail.trim().toLowerCase() !== normalizedEmail) return order;
+    changed = true;
+    return {
+      ...order,
+      userId,
+      userEmail: normalizedEmail,
+      updatedAt: Date.now(),
+      history: [...order.history, { at: Date.now(), status: order.status, note: "Conta vinculada ao login persistente" }],
+    };
+  });
+
+  if (changed) save(next);
+}
