@@ -32,9 +32,6 @@ if ! command -v bun >/dev/null; then
   ln -sf /root/.bun/bin/bun /usr/local/bin/bun
 fi
 
-echo "==> Instalando PM2"
-npm install -g pm2
-
 echo "==> Clonando / atualizando repo"
 if [ -d "${APP_DIR}/.git" ]; then
   git -C "${APP_DIR}" fetch --all
@@ -55,44 +52,33 @@ bun run build
 echo "==> Build (Cloudflare Worker output em dist/)"
 bun run build
 
-if [ ! -d "${APP_DIR}/dist/server/assets" ] || [ ! -d "${APP_DIR}/dist/client" ]; then
-  echo "ERRO: build não gerou dist/server/assets ou dist/client"
+if [ ! -d "${APP_DIR}/dist/client" ]; then
+  echo "ERRO: build não gerou dist/client"
   ls -la "${APP_DIR}/dist" 2>/dev/null || true
   exit 1
 fi
 
-echo "==> Instalando Miniflare (runtime workerd em Node) p/ servir o worker"
-# usa a mesma major compatível com o plugin/build do projeto
-npm install --no-save --prefix "${APP_DIR}" miniflare@^4
-
-ENTRY="${APP_DIR}/deploy/server.mjs"
-echo "==> Entry: ${ENTRY}"
-
-echo "==> Subindo com PM2"
+echo "==> Desativando processo PM2 antigo (se existir)"
 pm2 delete "${APP_NAME}" >/dev/null 2>&1 || true
-cd "${APP_DIR}"
-PORT="${PORT}" HOST="127.0.0.1" pm2 start "${ENTRY}" --name "${APP_NAME}" \
-  --interpreter node --update-env --time
-pm2 save
-pm2 startup systemd -u root --hp /root | tail -n 1 | bash || true
 
 echo "==> Configurando Nginx"
 cat > /etc/nginx/sites-available/${APP_NAME} <<NGINX
 server {
     listen 80;
     server_name ${DOMAIN};
+    root ${APP_DIR}/dist/client;
+    index index.html;
 
     client_max_body_size 25m;
 
+    location /assets/ {
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+        try_files \$uri =404;
+    }
+
     location / {
-        proxy_pass http://127.0.0.1:${PORT};
-        proxy_http_version 1.1;
-        proxy_set_header Host \$host;
-        proxy_set_header X-Real-IP \$remote_addr;
-        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto \$scheme;
-        proxy_set_header Upgrade \$http_upgrade;
-        proxy_set_header Connection "upgrade";
+        try_files \$uri \$uri/ /index.html;
     }
 }
 NGINX
@@ -113,7 +99,6 @@ certbot --nginx -d "${DOMAIN}" --non-interactive --agree-tos -m "admin@${DOMAIN}
 echo ""
 echo "==================================================="
 echo " OK! App rodando em: http://${DOMAIN}"
-echo " PM2 status:   pm2 status"
-echo " Logs:         pm2 logs ${APP_NAME}"
-echo " Atualizar:    cd ${APP_DIR} && git pull && bun install && bun run build && pm2 restart ${APP_NAME}"
+echo " Nginx:        systemctl status nginx"
+echo " Atualizar:    cd ${APP_DIR} && sudo bash deploy/update.sh"
 echo "==================================================="
