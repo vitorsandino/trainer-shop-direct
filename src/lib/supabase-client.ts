@@ -11,6 +11,7 @@ export function getSupabase(): Promise<SupabaseClient | null> {
       const cfg = await getSupabaseConfig();
       if (!cfg.url || !cfg.anonKey) {
         console.warn("[supabase] não configurado:", cfg.error);
+        clientPromise = null;
         return null;
       }
       return createClient(cfg.url, cfg.anonKey, {
@@ -18,6 +19,7 @@ export function getSupabase(): Promise<SupabaseClient | null> {
       });
     } catch (e) {
       console.error("[supabase] erro ao inicializar:", e);
+      clientPromise = null;
       return null;
     }
   })();
