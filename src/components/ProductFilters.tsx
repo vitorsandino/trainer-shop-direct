@@ -1,6 +1,6 @@
-import { CATEGORIES, type Category, type Product, productCategories } from "@/lib/products";
+import { CATEGORIES, type Category, type Product, productCategories, getCollections, subscribeCollections, type CollectionDef } from "@/lib/products";
 import { SlidersHorizontal, X } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 export type FilterState = {
   sort: "recent" | "asc" | "desc" | "name";
@@ -8,6 +8,7 @@ export type FilterState = {
   maxPrice: string;
   inStock: boolean;
   categories: Category[];
+  collections: string[];
 };
 
 export const defaultFilters: FilterState = {
@@ -16,6 +17,7 @@ export const defaultFilters: FilterState = {
   maxPrice: "",
   inStock: false,
   categories: [],
+  collections: [],
 };
 
 const PRICE_RANGES: { label: string; min: string; max: string }[] = [
