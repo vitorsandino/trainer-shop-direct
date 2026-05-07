@@ -1,7 +1,8 @@
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState, useCallback } from "react";
-import { ChevronLeft, ChevronRight, X, ZoomIn } from "lucide-react";
+import { ChevronLeft, ChevronRight, X, ZoomIn, ShoppingCart, Minus, Plus } from "lucide-react";
 import { getProduct, type Product, formatPrice, whatsappLink, CATEGORIES, trackProductView, trackProductClick, productCategories, discountPercent } from "@/lib/products";
+import { addToCart } from "@/lib/cart";
 
 export const Route = createFileRoute("/produto/$id")({
   component: ProductPage,
@@ -9,9 +10,11 @@ export const Route = createFileRoute("/produto/$id")({
 
 function ProductPage() {
   const { id } = Route.useParams();
+  const navigate = useNavigate();
   const [product, setProduct] = useState<Product | null | undefined>(undefined);
   const [active, setActive] = useState(0);
   const [lightbox, setLightbox] = useState(false);
+  const [qty, setQty] = useState(1);
 
   useEffect(() => {
     const p = getProduct(id);
@@ -119,17 +122,28 @@ function ProductPage() {
           <div className="rounded-lg border border-border bg-card p-4 text-sm leading-relaxed text-muted-foreground whitespace-pre-line">
             {product.description}
           </div>
+          <div className="flex items-center gap-3">
+            <span className="text-sm font-medium">Qtd:</span>
+            <div className="flex items-center gap-2">
+              <button onClick={() => setQty(q => Math.max(1, q - 1))} className="grid h-9 w-9 place-items-center rounded border border-border"><Minus className="h-4 w-4" /></button>
+              <span className="w-10 text-center font-semibold">{qty}</span>
+              <button onClick={() => setQty(q => q + 1)} className="grid h-9 w-9 place-items-center rounded border border-border"><Plus className="h-4 w-4" /></button>
+            </div>
+          </div>
+          <button
+            onClick={() => { addToCart(product.id, qty); trackProductClick(product.id); navigate({ to: "/carrinho" }); }}
+            className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-primary py-4 text-lg font-bold text-primary-foreground shadow-lg transition hover:opacity-90"
+          >
+            <ShoppingCart className="h-5 w-5" /> Adicionar ao carrinho
+          </button>
           <a
             href={whatsappLink(product.name)}
             target="_blank" rel="noopener noreferrer"
             onClick={() => trackProductClick(product.id)}
-            className="block w-full rounded-lg bg-whatsapp py-4 text-center text-lg font-bold text-whatsapp-foreground shadow-lg transition hover:brightness-110"
+            className="block w-full rounded-lg bg-whatsapp py-3 text-center text-sm font-bold text-whatsapp-foreground transition hover:brightness-110"
           >
-            Comprar via WhatsApp
+            Tirar dúvidas no WhatsApp
           </a>
-          <p className="text-center text-xs text-muted-foreground">
-            Mensagem automática: "Olá! Tenho interesse no produto: {product.name}"
-          </p>
         </div>
       </div>
 
