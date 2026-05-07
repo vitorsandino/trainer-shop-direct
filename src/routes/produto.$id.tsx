@@ -1,7 +1,7 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useEffect, useState, useCallback } from "react";
 import { ChevronLeft, ChevronRight, X, ZoomIn } from "lucide-react";
-import { getProduct, type Product, formatPrice, whatsappLink, CATEGORIES, trackProductView, trackProductClick } from "@/lib/products";
+import { getProduct, type Product, formatPrice, whatsappLink, CATEGORIES, trackProductView, trackProductClick, productCategories, discountPercent } from "@/lib/products";
 
 export const Route = createFileRoute("/produto/$id")({
   component: ProductPage,
@@ -42,7 +42,9 @@ function ProductPage() {
   if (product === undefined) return <div className="container mx-auto px-4 py-20 text-center text-muted-foreground">Carregando...</div>;
   if (product === null) throw notFound();
 
-  const catLabel = CATEGORIES.find(c => c.value === product.category)?.label;
+  const cats = productCategories(product);
+  const catLabels = cats.map(v => CATEGORIES.find(c => c.value === v)?.label ?? v).join(" · ");
+  const off = discountPercent(product);
   const hasImages = product.images.length > 0;
 
   return (
@@ -95,9 +97,20 @@ function ProductPage() {
         </div>
 
         <div className="space-y-4 md:space-y-5">
-          <p className="text-xs uppercase tracking-widest text-secondary">{catLabel}</p>
+          <p className="text-xs uppercase tracking-widest text-secondary">{catLabels}</p>
           <h1 className="font-display text-2xl md:text-4xl">{product.name}</h1>
-          <p className="font-display text-3xl text-primary md:text-4xl">{formatPrice(product.price)}</p>
+          {off !== null ? (
+            <div className="space-y-1">
+              <div className="flex items-center gap-3">
+                <p className="text-lg text-muted-foreground line-through md:text-xl">De {formatPrice(product.originalPrice!)}</p>
+                <span className="rounded-md bg-destructive px-2 py-1 text-xs font-bold text-destructive-foreground">-{off}% OFF</span>
+              </div>
+              <p className="font-display text-3xl text-primary md:text-4xl">Por {formatPrice(product.price)}</p>
+              <p className="text-sm font-semibold text-primary">Você economiza {formatPrice(product.originalPrice! - product.price)}</p>
+            </div>
+          ) : (
+            <p className="font-display text-3xl text-primary md:text-4xl">{formatPrice(product.price)}</p>
+          )}
           {product.stock !== undefined && (
             <p className="text-sm text-muted-foreground">
               {product.stock > 0 ? `${product.stock} em estoque` : "Esgotado"}
