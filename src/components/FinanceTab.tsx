@@ -189,7 +189,7 @@ export function FinanceTab() {
                 );
               })}
               {filtered.length === 0 && (
-                <tr><td colSpan={12} className="p-10 text-center text-muted-foreground">Nenhum registro financeiro</td></tr>
+                <tr><td colSpan={13} className="p-10 text-center text-muted-foreground">Nenhum registro financeiro</td></tr>
               )}
             </tbody>
           </table>
