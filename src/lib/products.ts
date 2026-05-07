@@ -115,7 +115,9 @@ const productListeners = new Set<() => void>();
 
 export function subscribeProducts(cb: () => void) {
   productListeners.add(cb);
-  return () => productListeners.delete(cb);
+  return () => {
+    productListeners.delete(cb);
+  };
 }
 
 const seed: Product[] = [];
@@ -189,7 +191,9 @@ function saveAnalytics(d: AnalyticsData) {
 const analyticsListeners = new Set<() => void>();
 export function subscribeAnalytics(cb: () => void) {
   analyticsListeners.add(cb);
-  return () => analyticsListeners.delete(cb);
+  return () => {
+    analyticsListeners.delete(cb);
+  };
 }
 
 export function trackPageView(path: string) {
