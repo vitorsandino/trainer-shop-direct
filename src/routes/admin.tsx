@@ -581,6 +581,12 @@ function ProductForm({ product, categories, onClose, onSave }: { product: Produc
               })}
             </div>
           </Field>
+          <Field label="Coleção (opcional — ex: Escarlate & Violeta)">
+            <select value={data.collection ?? ""} onChange={(e) => setData({ ...data, collection: e.target.value || undefined })} className="input">
+              <option value="">— Sem coleção —</option>
+              {collections.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
+            </select>
+          </Field>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <Field label="Preço (R$)">
               <input required type="number" step="0.01" value={data.price} onChange={(e) => setData({ ...data, price: parseFloat(e.target.value) || 0 })} className="input" />
