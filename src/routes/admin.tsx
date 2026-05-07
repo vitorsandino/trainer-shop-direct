@@ -104,6 +104,7 @@ function AdminDashboard({ onLogout }: { onLogout: () => void }) {
           {tab === "products" && <ProductsTab />}
           {tab === "categories" && <CategoriesTab />}
           {tab === "analytics" && <AnalyticsTab />}
+          {tab === "finance" && <FinanceTab />}
         </div>
       </div>
     </div>
