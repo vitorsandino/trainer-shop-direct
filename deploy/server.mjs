@@ -1,6 +1,7 @@
-// Servidor de produção: roda o Worker (dist/server) + assets estáticos (dist/client)
-// usando Miniflare 4. Escuta em 127.0.0.1:PORT atrás do Nginx.
+// Servidor de produção: inicia o runtime a partir da configuração gerada no build,
+// preservando a ordem correta entre SSR e assets.
 import { Miniflare, Log, LogLevel } from "miniflare";
+import { unstable_getMiniflareWorkerOptions } from "wrangler";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
 import fs from "node:fs";
@@ -8,7 +9,6 @@ import fs from "node:fs";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(__dirname, "..");
 const distServer = path.join(root, "dist", "server");
-const distClient = path.join(root, "dist", "client");
 const wranglerJson = path.join(distServer, "wrangler.json");
 
 if (!fs.existsSync(wranglerJson)) {
@@ -19,21 +19,15 @@ if (!fs.existsSync(wranglerJson)) {
 const PORT = Number(process.env.PORT || 3000);
 const HOST = process.env.HOST || "127.0.0.1";
 
+const { main, workerOptions } = await unstable_getMiniflareWorkerOptions(wranglerJson);
+
 const mf = new Miniflare({
   log: new Log(LogLevel.INFO),
   host: HOST,
   port: PORT,
-  modules: true,
-  scriptPath: path.join(distServer, "index.js"),
+  scriptPath: main,
   modulesRoot: distServer,
-  modulesRules: [
-    { type: "ESModule", include: ["**/*.js", "**/*.mjs"], fallthrough: true },
-  ],
-  compatibilityDate: "2025-09-24",
-  compatibilityFlags: ["nodejs_compat"],
-  assets: {
-    directory: distClient,
-  },
+  ...workerOptions,
 });
 
 await mf.ready;
