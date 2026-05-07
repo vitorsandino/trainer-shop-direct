@@ -25,6 +25,10 @@ function CheckoutPage() {
     if (user) setAddr(a => ({ ...a, fullName: a.fullName || user.name, phone: a.phone || (user.phone ?? "") }));
   }, [user]);
 
+  if (user === undefined) {
+    return <div className="container mx-auto px-4 py-16 text-center text-sm text-muted-foreground">Carregando sua sessão...</div>;
+  }
+
   if (!user) {
     return (
       <div className="container mx-auto px-4 py-16 text-center">

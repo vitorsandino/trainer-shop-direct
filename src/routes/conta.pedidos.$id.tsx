@@ -21,6 +21,7 @@ function OrderDetail() {
 
   if (order === undefined) return <div className="p-8 text-center text-muted-foreground">Carregando...</div>;
   if (order === null) throw notFound();
+  if (user === undefined) return <div className="p-8 text-center text-muted-foreground">Carregando conta...</div>;
   if (user && order.userId !== user.id) return <div className="rounded-lg border border-border bg-card p-8 text-center">Pedido não encontrado.</div>;
 
   return (

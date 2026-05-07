@@ -25,7 +25,6 @@ const MERGEABLE_LIST_KEYS: Record<string, string> = {
 };
 
 const SYNCABLE_KEYS = new Set([
-  "pkmn_users_v1",
   "pkmn_products_v2",
   "pkmn_categories_v1",
   "pkmn_collections_v1",

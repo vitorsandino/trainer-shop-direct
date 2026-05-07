@@ -18,6 +18,7 @@ function MyOrders() {
     refresh();
     return subscribeOrders(refresh);
   }, [user]);
+  if (user === undefined) return <div className="rounded-lg border border-border bg-card p-6 text-sm text-muted-foreground">Carregando pedidos...</div>;
   if (!user) return null;
 
   if (orders.length === 0) {

@@ -12,6 +12,7 @@ function ProfilePage() {
   const [name, setName] = useState(user?.name ?? "");
   const [phone, setPhone] = useState(user?.phone ?? "");
   const [saved, setSaved] = useState(false);
+  if (user === undefined) return <div className="rounded-lg border border-border bg-card p-6 text-sm text-muted-foreground">Carregando perfil...</div>;
   if (!user) return null;
 
   return (

@@ -44,8 +44,10 @@ export function Header() {
                   </button>
                 </div>
               </div>
-            ) : (
+            ) : user === null ? (
               <Link to="/login" className="hidden items-center gap-1 hover:underline sm:inline-flex"><User className="h-3.5 w-3.5" /> Entrar</Link>
+            ) : (
+              <span className="hidden text-xs text-white/80 sm:inline">Carregando...</span>
             )}
           </div>
         </div>
@@ -138,10 +140,12 @@ export function Header() {
                   <LogOut className="h-4 w-4" /> Sair
                 </button>
               </>
-            ) : (
+            ) : user === null ? (
               <Link to="/login" onClick={() => setOpen(false)} className="block rounded-md bg-primary px-3 py-2 text-center text-sm font-semibold text-primary-foreground">
                 Entrar / Criar conta
               </Link>
+            ) : (
+              <div className="rounded-md border border-border px-3 py-2 text-sm text-muted-foreground">Carregando conta...</div>
             )}
           </div>
         </div>
