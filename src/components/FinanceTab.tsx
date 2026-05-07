@@ -50,7 +50,7 @@ export function FinanceTab() {
     setEditing({
       id: crypto.randomUUID(),
       name: "", category: cats[0]?.value ?? "",
-      quantity: 1, cost: 0, price: 0, feePercent: 0, shipping: 0,
+      quantity: 1, cost: 0, price: 0, feePercent: 0, shipping: 0, packaging: 0, gift: 0,
       notes: "", status: "estoque", sold: false, createdAt: Date.now(),
     });
     setOpen(true);
