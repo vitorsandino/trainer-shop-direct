@@ -474,8 +474,7 @@ function AnalyticsTab() {
         <RankList title="Mais clicados (compra)" items={topClicks.map(([k, v]) => ({ name: productName(k), count: v }))} />
       </div>
 
-      <div className="flex justify-between rounded-lg border border-border bg-card p-4 text-sm text-muted-foreground">
-        <span>Os dados são coletados localmente neste navegador (sem servidor).</span>
+      <div className="flex justify-end rounded-lg border border-border bg-card p-4 text-sm text-muted-foreground">
         <div className="flex gap-2">
           <button onClick={refresh} className="rounded border border-border px-3 py-1 text-xs">Atualizar</button>
           <button onClick={() => { if (confirm("Zerar estatísticas?")) { resetAnalytics(); refresh(); } }} className="rounded border border-destructive px-3 py-1 text-xs text-destructive">Zerar</button>
