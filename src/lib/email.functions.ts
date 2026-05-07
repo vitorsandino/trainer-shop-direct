@@ -41,6 +41,39 @@ export const sendWelcomeEmail = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
+// ---------- Register (cria usuário já confirmado para evitar e-mail do Supabase) ----------
+export const registerUserServer = createServerFn({ method: "POST" })
+  .inputValidator((d) => z.object({
+    email: z.string().email(),
+    password: z.string().min(6).max(128),
+    name: z.string().min(1).max(120),
+    phone: z.string().max(40).optional(),
+  }).parse(d))
+  .handler(async ({ data }) => {
+    const sb = admin();
+    const { data: created, error } = await sb.auth.admin.createUser({
+      email: data.email,
+      password: data.password,
+      email_confirm: true, // <- não envia confirmação do Supabase
+      user_metadata: { name: data.name, phone: data.phone ?? "" },
+    });
+    if (error) {
+      const msg = (error.message || "").toLowerCase();
+      if (msg.includes("already") || msg.includes("registered") || msg.includes("exists")) {
+        throw new Error("Este e-mail já está cadastrado");
+      }
+      throw new Error(error.message || "Não foi possível cadastrar");
+    }
+    // dispara welcome via SMTP (não bloqueia retorno)
+    try {
+      const { subject, html } = welcomeEmail(data.name);
+      await send(data.email, subject, html);
+    } catch (e) {
+      console.warn("[email] welcome falhou:", e);
+    }
+    return { ok: true, userId: created.user?.id };
+  });
+
 // ---------- Order confirmation ----------
 const orderItemSchema = z.object({
   name: z.string(), qty: z.number().int().positive(), price: z.number().nonnegative(), image: z.string().optional(),
