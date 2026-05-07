@@ -2,9 +2,9 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import {
   type Category, type Product, type CategoryDef,
-  getProducts, upsertProduct, deleteProduct, formatPrice,
+  getProducts, subscribeProducts, upsertProduct, deleteProduct, formatPrice,
   getCategories, saveCategories, slugify, subscribeCategories,
-  getAnalytics, resetAnalytics, productCategories, discountPercent,
+  getAnalytics, subscribeAnalytics, resetAnalytics, productCategories, discountPercent,
   getCollections, saveCollections, subscribeCollections, type CollectionDef,
 } from "@/lib/products";
 import {
