@@ -102,6 +102,21 @@ function CheckoutPage() {
       });
       if (finChanged) saveFinance(nextFin);
 
+      // dispara e-mail de confirmação (não bloqueia)
+      void import("@/lib/email.functions").then(m =>
+        m.sendOrderConfirmation({ data: {
+          email: user.email,
+          code: order.code,
+          userName: user.name,
+          items: order.items.map(i => ({ name: i.name, qty: i.qty, price: i.price, image: i.image })),
+          total: order.total,
+          address: {
+            fullName: addr.fullName, street: addr.street, number: addr.number, complement: addr.complement,
+            district: addr.district, city: addr.city, state: addr.state, zip: addr.zip,
+          },
+        }}).catch(err => console.warn("[email] confirm:", err))
+      );
+
       clearCart();
       const msg = encodeURIComponent(
         `Olá! Acabei de fazer um pedido na Pandex.\n` +
