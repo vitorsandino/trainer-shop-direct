@@ -26,6 +26,36 @@ function CheckoutPage() {
     if (user) setAddr(a => ({ ...a, fullName: a.fullName || user.name, phone: a.phone || (user.phone ?? "") }));
   }, [user]);
 
+  const [cepLoading, setCepLoading] = useState(false);
+  const [cepError, setCepError] = useState("");
+
+  const lookupCep = async (rawZip: string) => {
+    const cep = rawZip.replace(/\D/g, "");
+    if (cep.length !== 8) return;
+    setCepLoading(true); setCepError("");
+    try {
+      const res = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+      const j = await res.json();
+      if (j.erro) { setCepError("CEP não encontrado"); return; }
+      setAddr(a => ({
+        ...a,
+        zip: cep.replace(/(\d{5})(\d{3})/, "$1-$2"),
+        street: j.logradouro || a.street,
+        district: j.bairro || a.district,
+        city: j.localidade || a.city,
+        state: j.uf || a.state,
+        complement: j.complemento || a.complement,
+      }));
+    } catch { setCepError("Falha ao buscar CEP"); }
+    finally { setCepLoading(false); }
+  };
+
+  const onZipChange = (v: string) => {
+    const masked = v.replace(/\D/g, "").slice(0, 8).replace(/(\d{5})(\d{0,3})/, (_, a, b) => b ? `${a}-${b}` : a);
+    setAddr(a => ({ ...a, zip: masked }));
+    if (masked.replace(/\D/g, "").length === 8) void lookupCep(masked);
+  };
+
   if (user === undefined) {
     return <div className="container mx-auto px-4 py-16 text-center text-sm text-muted-foreground">Carregando sua sessão...</div>;
   }
@@ -137,7 +167,12 @@ function CheckoutPage() {
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <Input label="Nome completo" value={addr.fullName} onChange={v => setAddr({ ...addr, fullName: v })} required />
             <Input label="Celular / WhatsApp" value={addr.phone} onChange={v => setAddr({ ...addr, phone: v })} required />
-            <Input label="CEP" value={addr.zip} onChange={v => setAddr({ ...addr, zip: v })} required />
+            <label className="block">
+              <span className="mb-1 block text-sm font-medium">CEP {cepLoading && <span className="text-xs text-muted-foreground">(buscando...)</span>}</span>
+              <input value={addr.zip} onChange={(e) => onZipChange(e.target.value)} required inputMode="numeric" placeholder="00000-000"
+                className="w-full rounded-md border border-border bg-input px-3 py-2 outline-none focus:border-primary" />
+              {cepError && <span className="mt-1 block text-xs text-destructive">{cepError}</span>}
+            </label>
             <Input label="Rua" value={addr.street} onChange={v => setAddr({ ...addr, street: v })} required />
             <Input label="Número" value={addr.number} onChange={v => setAddr({ ...addr, number: v })} required />
             <Input label="Complemento" value={addr.complement ?? ""} onChange={v => setAddr({ ...addr, complement: v })} />

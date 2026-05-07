@@ -25,9 +25,19 @@ function LoginPage() {
     e.preventDefault();
     setErr(""); setBusy(true);
     try {
-      const user = mode === "login"
-        ? await login(email, password)
-        : await register({ name, email, phone, password });
+      let user;
+      if (mode === "login") {
+        user = await login(email, password);
+      } else {
+        user = await register({ name, email, phone, password });
+        // Dispara o e-mail de boas-vindas (não bloqueia o login, mas loga falhas)
+        try {
+          const { sendWelcomeEmail } = await import("@/lib/email.functions");
+          await sendWelcomeEmail({ data: { email, name } });
+        } catch (mailErr: any) {
+          console.warn("[email] welcome falhou:", mailErr);
+        }
+      }
       if (user) migrateOrdersToUser(user.id, user.email);
       navigate({ to: search.redirect ?? "/conta" });
     } catch (e: any) { setErr(e?.message ?? "Erro"); }
