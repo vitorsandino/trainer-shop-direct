@@ -50,6 +50,16 @@ export function ProductCard({ product }: { product: Product }) {
               ★ DESTAQUE
             </span>
           )}
+          {typeof product.stock === "number" && product.stock <= 0 && (
+            <div className="absolute inset-0 grid place-items-center bg-black/50">
+              <span className="rounded-md bg-destructive px-3 py-1 text-xs font-bold text-destructive-foreground">ESGOTADO</span>
+            </div>
+          )}
+          {typeof product.stock === "number" && product.stock > 0 && product.stock <= 3 && (
+            <span className="absolute bottom-2 left-2 rounded bg-yellow-500/90 px-2 py-0.5 text-[10px] font-bold text-yellow-950">
+              Últimas {product.stock}
+            </span>
+          )}
         </div>
 
         {/* Texto */}
