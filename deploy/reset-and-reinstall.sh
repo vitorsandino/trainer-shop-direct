@@ -104,7 +104,7 @@ cat > /etc/nginx/sites-available/${APP_NAME} <<NGINX
 server {
     listen 80 default_server;
     listen [::]:80 default_server;
-    server_name ${DOMAIN};
+    server_name ${DOMAIN} www.${DOMAIN};
 
     client_max_body_size 25m;
 
