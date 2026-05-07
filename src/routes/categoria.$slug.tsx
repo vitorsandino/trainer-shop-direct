@@ -1,6 +1,6 @@
 import { createFileRoute, notFound } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { CATEGORIES, type Category, getProducts, type Product } from "@/lib/products";
+import { CATEGORIES, type Category, getProducts, subscribeProducts, type Product } from "@/lib/products";
 import { ProductCard } from "@/components/ProductCard";
 import { ProductFilters, applyFilters, defaultFilters, type FilterState } from "@/components/ProductFilters";
 
@@ -15,7 +15,11 @@ function CategoryPage() {
 
   const [products, setProducts] = useState<Product[]>([]);
   const [filters, setFilters] = useState<FilterState>(defaultFilters);
-  useEffect(() => setProducts(getProducts()), []);
+  useEffect(() => {
+    const refresh = () => setProducts(getProducts());
+    refresh();
+    return subscribeProducts(refresh);
+  }, []);
 
   const list = applyFilters(products, filters, { lockedCategory: slug as Category });
 

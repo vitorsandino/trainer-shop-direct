@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { z } from "zod";
-import { getProducts, type Product } from "@/lib/products";
+import { getProducts, subscribeProducts, type Product } from "@/lib/products";
 import { ProductCard } from "@/components/ProductCard";
 import { ProductFilters, applyFilters, defaultFilters, type FilterState } from "@/components/ProductFilters";
 
@@ -14,7 +14,11 @@ function SearchPage() {
   const { q = "" } = Route.useSearch();
   const [products, setProducts] = useState<Product[]>([]);
   const [filters, setFilters] = useState<FilterState>(defaultFilters);
-  useEffect(() => setProducts(getProducts()), []);
+  useEffect(() => {
+    const refresh = () => setProducts(getProducts());
+    refresh();
+    return subscribeProducts(refresh);
+  }, []);
 
   const term = q.toLowerCase();
   const matched = products.filter(p =>
