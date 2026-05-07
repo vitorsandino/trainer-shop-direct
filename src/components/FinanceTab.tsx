@@ -50,11 +50,18 @@ export function FinanceTab() {
     return { invest, revenue, gross, net, qty, avgMargin: marginCount ? marginSum / marginCount : 0, realized };
   }, [list]);
 
+  const monthOptions = useMemo(() => availableMonths(list), [list]);
+  const [month, setMonth] = useState<string>(() => new Date().toISOString().slice(0, 7));
+  useEffect(() => {
+    if (monthOptions.length && !monthOptions.includes(month)) setMonth(monthOptions[0]);
+  }, [monthOptions, month]);
+  const mStats = useMemo(() => monthlyStats(list, month), [list, month]);
+
   const handleNew = () => {
     setEditing({
       id: crypto.randomUUID(),
       name: "", category: cats[0]?.value ?? "",
-      quantity: 1, cost: 0, price: 0, feePercent: 0, shipping: 0, packaging: 0, gift: 0,
+      quantity: 1, cost: 0, price: 0, feePercent: 0, shipping: 0,
       notes: "", status: "estoque", sold: false, createdAt: Date.now(),
     });
     setOpen(true);
