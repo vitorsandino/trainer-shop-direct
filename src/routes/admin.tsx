@@ -472,16 +472,6 @@ function ProductForm({ product, categories, onClose, onSave }: { product: Produc
           <Field label="Nome">
             <input required value={data.name} onChange={(e) => setData({ ...data, name: e.target.value })} className="input" />
           </Field>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <Field label="Categoria">
-              <select value={data.category} onChange={(e) => setData({ ...data, category: e.target.value as Category })} className="input">
-                {categories.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
-              </select>
-            </Field>
-            <Field label="Preço (R$)">
-              <input required type="number" step="0.01" value={data.price} onChange={(e) => setData({ ...data, price: parseFloat(e.target.value) || 0 })} className="input" />
-            </Field>
-          </div>
           <Field label="Categorias (selecione uma ou mais)">
             <div className="flex flex-wrap gap-2 rounded-md border border-border bg-input p-2">
               {categories.map(c => {
