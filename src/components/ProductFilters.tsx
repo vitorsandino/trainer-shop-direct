@@ -166,6 +166,24 @@ export function ProductFilters({ value, onChange, showCategories, total }: Props
         </div>
       )}
 
+      {collections.length > 0 && (
+        <div>
+          <h3 className="mb-2 text-xs font-bold uppercase tracking-widest text-secondary">Coleção</h3>
+          <div className="space-y-1.5">
+            {collections.map(c => (
+              <label key={c.value} className="flex cursor-pointer items-center gap-2 text-sm">
+                <input
+                  type="checkbox"
+                  checked={value.collections.includes(c.value)}
+                  onChange={() => toggleColl(c.value)}
+                />
+                {c.label}
+              </label>
+            ))}
+          </div>
+        </div>
+      )}
+
       {activeCount > 0 && (
         <button onClick={reset} className="w-full rounded-md border border-border py-2 text-sm hover:bg-card">
           Limpar filtros ({activeCount})
