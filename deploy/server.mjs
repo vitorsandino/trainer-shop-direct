@@ -25,6 +25,7 @@ const mf = new Miniflare({
   log: new Log(LogLevel.INFO),
   host: HOST,
   port: PORT,
+  modules: true,
   scriptPath: main,
   modulesRoot: distServer,
   ...workerOptions,
