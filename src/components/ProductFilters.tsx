@@ -34,6 +34,7 @@ export function applyFilters(products: Product[], f: FilterState, opts?: { locke
   return products
     .filter(p => (opts?.lockedCategory ? productCategories(p).includes(opts.lockedCategory) : true))
     .filter(p => (f.categories.length ? productCategories(p).some(c => f.categories.includes(c)) : true))
+    .filter(p => (f.collections.length ? (p.collection ? f.collections.includes(p.collection) : false) : true))
     .filter(p => p.price >= min && p.price <= max)
     .filter(p => (f.inStock ? (p.stock ?? 0) > 0 : true))
     .sort((a, b) => {
@@ -55,12 +56,18 @@ type Props = {
 
 export function ProductFilters({ value, onChange, showCategories, total }: Props) {
   const [openMobile, setOpenMobile] = useState(false);
+  const [collections, setCollections] = useState<CollectionDef[]>(() => (typeof window !== "undefined" ? getCollections() : []));
+  useEffect(() => {
+    const unsub = subscribeCollections(() => setCollections(getCollections()));
+    return () => { unsub; };
+  }, []);
   const activeCount = useMemo(() => {
     let n = 0;
     if (value.minPrice) n++;
     if (value.maxPrice) n++;
     if (value.inStock) n++;
     n += value.categories.length;
+    n += value.collections.length;
     return n;
   }, [value]);
 
@@ -70,6 +77,14 @@ export function ProductFilters({ value, onChange, showCategories, total }: Props
       categories: value.categories.includes(c)
         ? value.categories.filter(x => x !== c)
         : [...value.categories, c],
+    });
+  };
+  const toggleColl = (c: string) => {
+    onChange({
+      ...value,
+      collections: value.collections.includes(c)
+        ? value.collections.filter(x => x !== c)
+        : [...value.collections, c],
     });
   };
 
