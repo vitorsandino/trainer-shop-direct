@@ -1,7 +1,7 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { Search, Menu, X, Instagram, Facebook, Youtube, ShoppingCart, User, ChevronDown } from "lucide-react";
 import { useState } from "react";
-import { CATEGORIES, WHATSAPP_NUMBER, getCategories } from "@/lib/products";
+import { CATEGORIES, WHATSAPP_NUMBER } from "@/lib/products";
 import logo from "@/assets/pandex-logo.png";
 
 export function Header() {
@@ -65,18 +65,6 @@ export function Header() {
               Cartas
             </Link>
 
-            <div className="group relative">
-              <button className="flex items-center gap-1 rounded-md px-3 py-2 text-sm font-medium text-foreground/80 hover:text-primary">
-                Produtos <ChevronDown className="h-3.5 w-3.5" />
-              </button>
-              <div className="invisible absolute left-0 top-full z-50 min-w-[200px] rounded-md border border-border bg-card py-2 opacity-0 shadow-lg transition group-hover:visible group-hover:opacity-100">
-                {getCategories().map(c => (
-                  <Link key={c.value} to="/categoria/$slug" params={{ slug: c.value }} className="block px-4 py-2 text-sm hover:bg-muted">
-                    {c.label}
-                  </Link>
-                ))}
-              </div>
-            </div>
 
             <a href={`https://wa.me/${WHATSAPP_NUMBER}`} target="_blank" rel="noopener noreferrer" className="rounded-md px-3 py-2 text-sm font-medium text-foreground/80 hover:text-primary">
               Contato
