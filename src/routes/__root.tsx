@@ -47,10 +47,10 @@ export const Route = createRootRoute({
       { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/2d50dbe5-2615-4a99-8992-eae1ccb11ac3/id-preview-3709d46a--ee12ceb6-44eb-405c-946c-16ce7c5f20b0.lovable.app-1778106348163.png" },
     ],
     links: [
-      {
-        rel: "stylesheet",
-        href: appCss,
-      },
+      { rel: "stylesheet", href: appCss },
+      { rel: "icon", type: "image/x-icon", href: "/favicon.ico" },
+      { rel: "icon", type: "image/png", sizes: "256x256", href: "/favicon-256.png" },
+      { rel: "apple-touch-icon", href: "/favicon-256.png" },
     ],
   }),
   shellComponent: RootShell,
