@@ -175,6 +175,7 @@ export function FinanceTab() {
                     <td className={`p-3 font-semibold ${c.netUnit < 0 ? "text-destructive" : "text-emerald-500"}`}>{formatPrice(c.netUnit)}</td>
                     <td className={`p-3 font-bold ${c.totalProfit < 0 ? "text-destructive" : "text-emerald-500"}`}>{formatPrice(c.totalProfit)}</td>
                     <td className="p-3"><span className={`rounded px-2 py-0.5 text-xs font-bold ${badge}`}>{c.marginPercent.toFixed(1)}%</span></td>
+                    <td className="p-3 text-xs text-muted-foreground">{daysInStock(e)}d {e.sold ? "(vendeu)" : ""}</td>
                     <td className="p-3"><StatusBadge entry={e} /></td>
                     <td className="space-x-1 p-3 text-right">
                       <button onClick={() => { setEditing(e); setOpen(true); }} className="inline-flex items-center gap-1 rounded px-2 py-1 text-xs text-secondary hover:bg-secondary/10">
