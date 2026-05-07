@@ -101,10 +101,18 @@ fi
 echo "==> [7/8] Configurando Nginx (proxy reverso)"
 rm -f /etc/nginx/sites-enabled/default /etc/nginx/sites-available/default
 cat > /etc/nginx/sites-available/${APP_NAME} <<NGINX
+# Redireciona www -> domínio raiz (HTTP e HTTPS)
+server {
+    listen 80;
+    listen [::]:80;
+    server_name www.${DOMAIN};
+    return 301 https://${DOMAIN}\$request_uri;
+}
+
 server {
     listen 80 default_server;
     listen [::]:80 default_server;
-    server_name ${DOMAIN} www.${DOMAIN};
+    server_name ${DOMAIN};
 
     client_max_body_size 25m;
 
@@ -131,12 +139,12 @@ if command -v ufw >/dev/null 2>&1; then
   ufw allow 'Nginx Full' 2>/dev/null || true
 fi
 
-echo "==> [8/8] Emitindo SSL para ${DOMAIN}"
+echo "==> [8/8] Emitindo SSL para ${DOMAIN} e www.${DOMAIN}"
 certbot --nginx \
-  -d "${DOMAIN}" \
-  --non-interactive --agree-tos -m "${EMAIL}" --redirect \
-  || echo "AVISO: certbot falhou. Confirme DNS e rode:
-  certbot --nginx -d ${DOMAIN} --agree-tos -m ${EMAIL} --redirect"
+  -d "${DOMAIN}" -d "www.${DOMAIN}" \
+  --expand --non-interactive --agree-tos -m "${EMAIL}" --redirect \
+  || echo "AVISO: certbot falhou. Confirme DNS (A record do www -> IP do servidor) e rode:
+  certbot --nginx -d ${DOMAIN} -d www.${DOMAIN} --expand --agree-tos -m ${EMAIL} --redirect"
 
 echo ""
 echo "==================================================="
