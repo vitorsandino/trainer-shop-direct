@@ -48,8 +48,10 @@ export function slugify(s: string) {
 export type Product = {
   id: string;
   name: string;
-  category: Category;
+  category: Category; // legacy — categoria principal (compat)
+  categories?: Category[]; // múltiplas categorias
   price: number;
+  originalPrice?: number; // preço "de" (antes do desconto)
   description: string;
   images: string[];
   stock?: number;
@@ -59,6 +61,18 @@ export type Product = {
   bannerBadge?: string;
   createdAt: number;
 };
+
+/** Retorna todas as categorias do produto (compat com category singular). */
+export function productCategories(p: Product): Category[] {
+  if (p.categories && p.categories.length > 0) return p.categories;
+  return p.category ? [p.category] : [];
+}
+
+/** Retorna o % de desconto se houver originalPrice válido, senão null. */
+export function discountPercent(p: Pick<Product, "price" | "originalPrice">): number | null {
+  if (!p.originalPrice || p.originalPrice <= p.price) return null;
+  return Math.round(((p.originalPrice - p.price) / p.originalPrice) * 100);
+}
 
 const KEY = "pkmn_products_v2";
 
