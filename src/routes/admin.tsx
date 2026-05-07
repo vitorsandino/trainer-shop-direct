@@ -9,9 +9,10 @@ import {
 } from "@/lib/products";
 import {
   Trash2, Plus, X, Package, Tag, BarChart3, LogOut, Wallet, Layers,
-  Image as ImageIcon, Eye, MousePointerClick, TrendingUp, Pencil,
+  Image as ImageIcon, Eye, MousePointerClick, TrendingUp, Pencil, ShoppingBag,
 } from "lucide-react";
 import { FinanceTab } from "@/components/FinanceTab";
+import { OrdersTab } from "@/components/OrdersTab";
 
 const ADMIN_USER = "admin";
 const ADMIN_PASSWORD = "s3n4@123";
@@ -21,7 +22,7 @@ export const Route = createFileRoute("/admin")({
   component: AdminPage,
 });
 
-type Tab = "products" | "categories" | "collections" | "analytics" | "finance";
+type Tab = "products" | "categories" | "collections" | "orders" | "analytics" | "finance";
 
 function AdminPage() {
   const [authed, setAuthed] = useState(false);
@@ -70,6 +71,7 @@ function AdminDashboard({ onLogout }: { onLogout: () => void }) {
     { id: "products", label: "Produtos", icon: Package },
     { id: "categories", label: "Categorias", icon: Tag },
     { id: "collections", label: "Coleções", icon: Layers },
+    { id: "orders", label: "Pedidos", icon: ShoppingBag },
     { id: "analytics", label: "Acessos", icon: BarChart3 },
     { id: "finance", label: "Financeiro", icon: Wallet },
   ];
@@ -106,6 +108,7 @@ function AdminDashboard({ onLogout }: { onLogout: () => void }) {
           {tab === "products" && <ProductsTab />}
           {tab === "categories" && <CategoriesTab />}
           {tab === "collections" && <CollectionsTab />}
+          {tab === "orders" && <OrdersTab />}
           {tab === "analytics" && <AnalyticsTab />}
           {tab === "finance" && <FinanceTab />}
         </div>
