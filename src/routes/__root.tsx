@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { trackPageView } from "@/lib/products";
+import { initCloudSync } from "@/lib/cloud-sync";
 
 import appCss from "../styles.css?url";
 
@@ -77,6 +78,10 @@ function RootShell({ children }: { children: React.ReactNode }) {
 
 function RootComponent() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  useEffect(() => {
+    // Inicia sync com nuvem (pull dos dados mais recentes)
+    initCloudSync().catch(e => console.error("[cloud-sync] init falhou", e));
+  }, []);
   useEffect(() => {
     if (typeof window !== "undefined" && !pathname.startsWith("/admin")) {
       trackPageView(pathname);

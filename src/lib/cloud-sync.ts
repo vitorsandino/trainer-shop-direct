@@ -16,8 +16,13 @@ const TABLE = "app_kv";
 
 let initialized = false;
 let pulling = false;
+let pushEnabled = false;
 const pendingPushes = new Map<string, NodeJS.Timeout>();
 const PUSH_DEBOUNCE_MS = 800;
+
+/** Habilita push automático (só admin deve chamar). */
+export function enablePush() { pushEnabled = true; }
+export function disablePush() { pushEnabled = false; }
 
 const statusListeners = new Set<(s: SyncStatus) => void>();
 export type SyncStatus = "idle" | "pulling" | "pushing" | "error" | "offline";
@@ -102,6 +107,7 @@ function installInterceptor() {
     original.call(this, key, value);
     if (this !== window.localStorage) return;
     if (pulling) return;
+    if (!pushEnabled) return;
     if (!key.startsWith(SYNC_PREFIX)) return;
     // Debounce
     const existing = pendingPushes.get(key);
