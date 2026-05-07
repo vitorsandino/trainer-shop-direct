@@ -55,6 +55,20 @@ function CheckoutPage() {
     e.preventDefault();
     setBusy(true);
     try {
+      // valida estoque novamente antes de criar
+      const fresh = getProducts();
+      for (const l of data.lines) {
+        const p = fresh.find(x => x.id === l.product.id);
+        if (!p) { alert(`Produto "${l.product.name}" não está mais disponível.`); setBusy(false); return; }
+        if (typeof p.stock === "number" && l.qty > p.stock) {
+          alert(`Estoque de "${p.name}" mudou. Disponível: ${p.stock}.`);
+          reconcileCartWithStock();
+          setData(getCartLines());
+          setBusy(false);
+          return;
+        }
+      }
+
       const order = createOrder({
         userId: user.id,
         userEmail: user.email,
@@ -65,8 +79,30 @@ function CheckoutPage() {
         total: data.total,
         address: addr,
       });
+
+      // decrementa estoque dos produtos
+      const updated = fresh.map(p => {
+        const line = data.lines.find(l => l.product.id === p.id);
+        if (!line || typeof p.stock !== "number") return p;
+        return { ...p, stock: Math.max(0, p.stock - line.qty) };
+      });
+      saveProducts(updated);
+
+      // marca registros financeiros vinculados como vendidos (proporcional)
+      const fin = getFinance();
+      const now = Date.now();
+      let finChanged = false;
+      const nextFin = fin.map(f => {
+        if (!f.productId) return f;
+        const line = data.lines.find(l => l.product.id === f.productId);
+        if (!line) return f;
+        if (f.sold) return f;
+        finChanged = true;
+        return { ...f, sold: true, soldAt: now, status: "vendido" as const };
+      });
+      if (finChanged) saveFinance(nextFin);
+
       clearCart();
-      // mensagem WhatsApp
       const msg = encodeURIComponent(
         `Olá! Acabei de fazer um pedido na Pandex.\n` +
         `Pedido: ${order.code}\nNome: ${user.name}\nTotal: ${formatPrice(order.total)}\n` +
