@@ -1,28 +1,28 @@
 #!/usr/bin/env bash
 # ============================================================
-# Instalação automática em Debian 12 (root ou sudo)
+# Instalação inicial em Debian 12 — SOMENTE estático via Nginx
+# (sem Node em produção, sem PM2, sem Miniflare)
+#
 # Uso:
-#   sudo REPO_URL="https://github.com/SEU_USUARIO/SEU_REPO.git" \
+#   sudo REPO_URL="https://github.com/USER/REPO.git" \
 #        DOMAIN="meusite.com.br" \
-#        APP_NAME="trainer-shop" \
 #        bash install-debian12.sh
 # ============================================================
 set -euo pipefail
 
 REPO_URL="${REPO_URL:-https://github.com/vitorsandino/trainer-shop-direct.git}"
-DOMAIN="${DOMAIN:?defina DOMAIN=seudominio.com (ex: DOMAIN=meusite.com.br)}"
+DOMAIN="${DOMAIN:?defina DOMAIN=seudominio.com}"
 APP_NAME="${APP_NAME:-trainer-shop-direct}"
 APP_DIR="/var/www/${APP_NAME}"
-PORT="${PORT:-3000}"
-NODE_MAJOR="20"
+EMAIL="${EMAIL:-admin@${DOMAIN}}"
 
 echo "==> Atualizando sistema"
 apt update && apt upgrade -y
-apt install -y curl git nginx ufw ca-certificates gnupg unzip
+apt install -y curl git nginx certbot python3-certbot-nginx ca-certificates gnupg unzip ufw
 
-echo "==> Instalando Node.js ${NODE_MAJOR} LTS"
-if ! command -v node >/dev/null || [ "$(node -v | cut -dv -f2 | cut -d. -f1)" != "${NODE_MAJOR}" ]; then
-  curl -fsSL https://deb.nodesource.com/setup_${NODE_MAJOR}.x | bash -
+echo "==> Instalando Node.js 20 (necessário só para o build)"
+if ! command -v node >/dev/null; then
+  curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
   apt install -y nodejs
 fi
 
@@ -42,30 +42,25 @@ else
 fi
 
 cd "${APP_DIR}"
-
-echo "==> Instalando dependências"
 bun install
-
-echo "==> Build"
-bun run build
-
-echo "==> Build (Cloudflare Worker output em dist/)"
 bun run build
 
 if [ ! -d "${APP_DIR}/dist/client" ]; then
   echo "ERRO: build não gerou dist/client"
-  ls -la "${APP_DIR}/dist" 2>/dev/null || true
   exit 1
 fi
 
-echo "==> Desativando processo PM2 antigo (se existir)"
-pm2 delete "${APP_NAME}" >/dev/null 2>&1 || true
+chown -R www-data:www-data "${APP_DIR}/dist"
+chmod -R a+rX "${APP_DIR}/dist"
 
-echo "==> Configurando Nginx"
+echo "==> Configurando Nginx (estático puro)"
+rm -f /etc/nginx/sites-enabled/default
 cat > /etc/nginx/sites-available/${APP_NAME} <<NGINX
 server {
-    listen 80;
-    server_name ${DOMAIN};
+    listen 80 default_server;
+    listen [::]:80 default_server;
+    server_name ${DOMAIN} www.${DOMAIN};
+
     root ${APP_DIR}/dist/client;
     index index.html;
 
@@ -83,22 +78,20 @@ server {
 }
 NGINX
 ln -sf /etc/nginx/sites-available/${APP_NAME} /etc/nginx/sites-enabled/${APP_NAME}
-rm -f /etc/nginx/sites-enabled/default
-nginx -t && systemctl reload nginx
+nginx -t && systemctl restart nginx
 
 echo "==> Firewall"
 ufw allow OpenSSH || true
 ufw allow 'Nginx Full' || true
 yes | ufw enable || true
 
-echo "==> HTTPS (Let's Encrypt)"
-apt install -y certbot python3-certbot-nginx
-certbot --nginx -d "${DOMAIN}" --non-interactive --agree-tos -m "admin@${DOMAIN}" --redirect || \
-  echo "AVISO: certbot falhou (DNS apontando pro servidor?). Rode manualmente depois."
+echo "==> Emitindo SSL"
+certbot --nginx -d "${DOMAIN}" -d "www.${DOMAIN}" \
+  --non-interactive --agree-tos -m "${EMAIL}" --redirect \
+  || echo "AVISO: certbot falhou. Verifique DNS e rode manualmente."
 
 echo ""
 echo "==================================================="
-echo " OK! App rodando em: http://${DOMAIN}"
-echo " Nginx:        systemctl status nginx"
-echo " Atualizar:    cd ${APP_DIR} && sudo bash deploy/update.sh"
+echo " ✅ App: https://${DOMAIN}"
+echo " Atualizar:  sudo bash ${APP_DIR}/deploy/update.sh"
 echo "==================================================="
