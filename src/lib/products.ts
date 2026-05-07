@@ -27,7 +27,9 @@ export function getCategories(): CategoryDef[] {
 const catListeners = new Set<() => void>();
 export function subscribeCategories(cb: () => void) {
   catListeners.add(cb);
-  return () => catListeners.delete(cb);
+  return () => {
+    catListeners.delete(cb);
+  };
 }
 if (typeof window !== "undefined") {
   window.addEventListener("cloud-sync-key", ((event: Event) => {
@@ -92,7 +94,12 @@ export function getCollections(): CollectionDef[] {
   try { return JSON.parse(raw); } catch { return DEFAULT_COLLECTIONS; }
 }
 const collListeners = new Set<() => void>();
-export function subscribeCollections(cb: () => void) { collListeners.add(cb); return () => collListeners.delete(cb); }
+export function subscribeCollections(cb: () => void) {
+  collListeners.add(cb);
+  return () => {
+    collListeners.delete(cb);
+  };
+}
 export function saveCollections(list: CollectionDef[]) {
   localStorage.setItem(COLL_KEY, JSON.stringify(list));
   collListeners.forEach(cb => cb());
