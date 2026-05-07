@@ -1,9 +1,10 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
-import { clearCart, getCartLines } from "@/lib/cart";
+import { clearCart, getCartLines, reconcileCartWithStock } from "@/lib/cart";
 import { createOrder, type OrderAddress } from "@/lib/orders";
-import { formatPrice, WHATSAPP_NUMBER } from "@/lib/products";
+import { formatPrice, WHATSAPP_NUMBER, getProducts, saveProducts } from "@/lib/products";
+import { getFinance, saveFinance } from "@/lib/finance";
 
 export const Route = createFileRoute("/checkout")({
   component: CheckoutPage,
