@@ -408,12 +408,22 @@ function FinanceForm({ entry, cats, onClose, onSave }: { entry: FinanceEntry; ca
 
           {/* Resumo em tempo real */}
           <div className="grid grid-cols-2 gap-3 rounded-lg border border-border bg-background/40 p-4 sm:grid-cols-3">
-            <Mini label="Lucro bruto un." value={formatPrice(c.grossUnit)} />
-            <Mini label="Lucro líquido un." value={formatPrice(c.netUnit)} positive={c.netUnit >= 0} />
-            <Mini label="Margem" value={`${c.marginPercent.toFixed(1)}%`} positive={c.marginPercent >= 0} />
-            <Mini label="Investimento" value={formatPrice(c.invest)} />
-            <Mini label="Retorno estimado" value={formatPrice(c.revenue)} />
-            <Mini label="Lucro total" value={formatPrice(c.totalProfit)} positive={c.totalProfit >= 0} />
+            {data.expenseOnly ? (
+              <>
+                <Mini label="Valor unitário" value={formatPrice(data.cost)} />
+                <Mini label="Quantidade" value={String(data.quantity)} />
+                <Mini label="Total investido (saída)" value={formatPrice(c.invest)} positive={false} />
+              </>
+            ) : (
+              <>
+                <Mini label="Lucro bruto un." value={formatPrice(c.grossUnit)} />
+                <Mini label="Lucro líquido un." value={formatPrice(c.netUnit)} positive={c.netUnit >= 0} />
+                <Mini label="Margem" value={`${c.marginPercent.toFixed(1)}%`} positive={c.marginPercent >= 0} />
+                <Mini label="Investimento" value={formatPrice(c.invest)} />
+                <Mini label="Retorno estimado" value={formatPrice(c.revenue)} />
+                <Mini label="Lucro total" value={formatPrice(c.totalProfit)} positive={c.totalProfit >= 0} />
+              </>
+            )}
           </div>
 
           <div className="flex gap-2 pt-2">
