@@ -5,9 +5,10 @@ import {
   getProducts, upsertProduct, deleteProduct, formatPrice,
   getCategories, saveCategories, slugify, subscribeCategories,
   getAnalytics, resetAnalytics, productCategories, discountPercent,
+  getCollections, saveCollections, subscribeCollections, type CollectionDef,
 } from "@/lib/products";
 import {
-  Trash2, Plus, X, Package, Tag, BarChart3, LogOut, Wallet,
+  Trash2, Plus, X, Package, Tag, BarChart3, LogOut, Wallet, Layers,
   Image as ImageIcon, Eye, MousePointerClick, TrendingUp, Pencil,
 } from "lucide-react";
 import { FinanceTab } from "@/components/FinanceTab";
@@ -20,7 +21,7 @@ export const Route = createFileRoute("/admin")({
   component: AdminPage,
 });
 
-type Tab = "products" | "categories" | "analytics" | "finance";
+type Tab = "products" | "categories" | "collections" | "analytics" | "finance";
 
 function AdminPage() {
   const [authed, setAuthed] = useState(false);
