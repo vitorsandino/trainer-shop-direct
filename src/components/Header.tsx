@@ -1,7 +1,9 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
-import { Search, Menu, X, Instagram, Facebook, Youtube, ShoppingCart, User, ChevronDown } from "lucide-react";
+import { Search, Menu, X, Instagram, Facebook, Youtube, ShoppingCart, User, ChevronDown, LogOut, Package } from "lucide-react";
 import { useState } from "react";
 import { WHATSAPP_NUMBER } from "@/lib/products";
+import { useAuth, useCartCount } from "@/hooks/use-auth";
+import { logout } from "@/lib/auth";
 import logo from "@/assets/pandex-logo.png";
 
 export function Header() {
@@ -9,6 +11,8 @@ export function Header() {
   const [q, setQ] = useState("");
   const [open, setOpen] = useState(false);
   const path = useRouterState({ select: (s) => s.location.pathname });
+  const user = useAuth();
+  const count = useCartCount();
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -27,7 +31,22 @@ export function Header() {
             <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="grid h-7 w-7 place-items-center rounded-full bg-white/15 hover:bg-white/25"><Facebook className="h-3.5 w-3.5" /></a>
             <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" aria-label="YouTube" className="grid h-7 w-7 place-items-center rounded-full bg-white/15 hover:bg-white/25"><Youtube className="h-3.5 w-3.5" /></a>
             <span className="mx-2 hidden h-4 w-px bg-white/30 sm:inline" />
-            <a href="#" className="hidden items-center gap-1 hover:underline sm:inline-flex"><User className="h-3.5 w-3.5" /> Login</a>
+            {user ? (
+              <div className="group relative hidden sm:block">
+                <button className="inline-flex items-center gap-1 hover:underline">
+                  <User className="h-3.5 w-3.5" /> {user.name.split(" ")[0]} <ChevronDown className="h-3 w-3" />
+                </button>
+                <div className="invisible absolute right-0 top-full z-50 min-w-[180px] rounded-md border border-border bg-card py-2 text-foreground opacity-0 shadow-lg transition group-hover:visible group-hover:opacity-100">
+                  <Link to="/conta" className="block px-4 py-2 text-sm hover:bg-muted">Minha conta</Link>
+                  <Link to="/conta/pedidos" className="block px-4 py-2 text-sm hover:bg-muted">Meus pedidos</Link>
+                  <button onClick={() => { logout(); navigate({ to: "/" }); }} className="flex w-full items-center gap-2 px-4 py-2 text-left text-sm hover:bg-muted">
+                    <LogOut className="h-3.5 w-3.5" /> Sair
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <Link to="/login" className="hidden items-center gap-1 hover:underline sm:inline-flex"><User className="h-3.5 w-3.5" /> Entrar</Link>
+            )}
           </div>
         </div>
       </div>
@@ -48,23 +67,12 @@ export function Header() {
               Início
             </Link>
 
-            <div className="group relative">
-              <button className="flex items-center gap-1 rounded-md px-3 py-2 text-sm font-medium text-foreground/80 hover:text-primary">
-                Sobre <ChevronDown className="h-3.5 w-3.5" />
-              </button>
-              <div className="invisible absolute left-0 top-full z-50 min-w-[180px] rounded-md border border-border bg-card py-2 opacity-0 shadow-lg transition group-hover:visible group-hover:opacity-100">
-                <a href="#sobre" className="block px-4 py-2 text-sm hover:bg-muted">A loja</a>
-                <a href={`https://wa.me/${WHATSAPP_NUMBER}`} target="_blank" rel="noopener noreferrer" className="block px-4 py-2 text-sm hover:bg-muted">Atendimento</a>
-              </div>
-            </div>
-
             <Link to="/categoria/$slug" params={{ slug: "booster" }} className="rounded-md px-3 py-2 text-sm font-medium text-foreground/80 hover:text-primary">
               Boosters
             </Link>
             <Link to="/categoria/$slug" params={{ slug: "avulsas" }} className="rounded-md px-3 py-2 text-sm font-medium text-foreground/80 hover:text-primary">
               Cartas
             </Link>
-
 
             <a href={`https://wa.me/${WHATSAPP_NUMBER}`} target="_blank" rel="noopener noreferrer" className="rounded-md px-3 py-2 text-sm font-medium text-foreground/80 hover:text-primary">
               Contato
@@ -85,10 +93,10 @@ export function Header() {
             </div>
           </form>
 
-          <button aria-label="Carrinho" className="relative hidden h-11 w-11 place-items-center rounded-full bg-secondary text-secondary-foreground shadow md:grid">
+          <Link to="/carrinho" aria-label="Carrinho" className="relative hidden h-11 w-11 place-items-center rounded-full bg-secondary text-secondary-foreground shadow md:grid">
             <ShoppingCart className="h-5 w-5" />
-            <span className="absolute -right-1 -top-1 grid h-5 w-5 place-items-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">0</span>
-          </button>
+            <span className="absolute -right-1 -top-1 grid h-5 w-5 place-items-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">{count}</span>
+          </Link>
 
           <button onClick={() => setOpen(!open)} className="ml-auto rounded-md p-2 lg:hidden" aria-label="Menu">
             {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -115,6 +123,25 @@ export function Header() {
               <Link to="/categoria/$slug" params={{ slug: "booster" }} onClick={() => setOpen(false)} className="rounded-md bg-muted px-3 py-2 text-sm">Boosters</Link>
               <Link to="/categoria/$slug" params={{ slug: "avulsas" }} onClick={() => setOpen(false)} className="rounded-md bg-muted px-3 py-2 text-sm">Cartas</Link>
             </div>
+            <Link to="/carrinho" onClick={() => setOpen(false)} className="flex items-center justify-between rounded-md bg-secondary px-3 py-2 text-sm font-semibold text-secondary-foreground">
+              <span className="inline-flex items-center gap-2"><ShoppingCart className="h-4 w-4" /> Carrinho</span>
+              <span className="rounded-full bg-primary px-2 text-xs text-primary-foreground">{count}</span>
+            </Link>
+            {user ? (
+              <>
+                <Link to="/conta" onClick={() => setOpen(false)} className="block rounded-md border border-border px-3 py-2 text-sm">Minha conta</Link>
+                <Link to="/conta/pedidos" onClick={() => setOpen(false)} className="flex items-center gap-2 rounded-md border border-border px-3 py-2 text-sm">
+                  <Package className="h-4 w-4" /> Meus pedidos
+                </Link>
+                <button onClick={() => { logout(); setOpen(false); navigate({ to: "/" }); }} className="flex w-full items-center gap-2 rounded-md border border-border px-3 py-2 text-sm">
+                  <LogOut className="h-4 w-4" /> Sair
+                </button>
+              </>
+            ) : (
+              <Link to="/login" onClick={() => setOpen(false)} className="block rounded-md bg-primary px-3 py-2 text-center text-sm font-semibold text-primary-foreground">
+                Entrar / Criar conta
+              </Link>
+            )}
           </div>
         </div>
       )}

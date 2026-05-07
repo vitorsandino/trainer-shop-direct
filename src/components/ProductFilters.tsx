@@ -56,10 +56,11 @@ type Props = {
 
 export function ProductFilters({ value, onChange, showCategories, total }: Props) {
   const [openMobile, setOpenMobile] = useState(false);
-  const [collections, setCollections] = useState<CollectionDef[]>(() => (typeof window !== "undefined" ? getCollections() : []));
+  const [collections, setCollections] = useState<CollectionDef[]>([]);
   useEffect(() => {
+    setCollections(getCollections());
     const unsub = subscribeCollections(() => setCollections(getCollections()));
-    return () => { unsub; };
+    return () => { unsub(); };
   }, []);
   const activeCount = useMemo(() => {
     let n = 0;

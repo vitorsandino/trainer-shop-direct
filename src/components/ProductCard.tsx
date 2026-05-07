@@ -1,5 +1,7 @@
 import { Link } from "@tanstack/react-router";
-import { type Product, formatPrice, whatsappLink, discountPercent, productCategories } from "@/lib/products";
+import { type Product, formatPrice, discountPercent, productCategories } from "@/lib/products";
+import { addToCart } from "@/lib/cart";
+import { ShoppingCart } from "lucide-react";
 
 export function ProductCard({ product }: { product: Product }) {
   const off = discountPercent(product);
@@ -33,14 +35,13 @@ export function ProductCard({ product }: { product: Product }) {
           )}
         </div>
       </Link>
-      <a
-        href={whatsappLink(product.name)}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="absolute inset-x-3 bottom-3 translate-y-16 rounded-md bg-whatsapp px-3 py-2 text-center text-xs font-bold text-whatsapp-foreground opacity-0 transition group-hover:translate-y-0 group-hover:opacity-100"
+      <button
+        type="button"
+        onClick={(e) => { e.preventDefault(); addToCart(product.id, 1); }}
+        className="absolute inset-x-3 bottom-3 inline-flex translate-y-16 items-center justify-center gap-1.5 rounded-md bg-primary px-3 py-2 text-xs font-bold text-primary-foreground opacity-0 shadow-lg transition group-hover:translate-y-0 group-hover:opacity-100"
       >
-        Comprar via WhatsApp
-      </a>
+        <ShoppingCart className="h-3.5 w-3.5" /> Adicionar ao carrinho
+      </button>
     </div>
   );
 }
