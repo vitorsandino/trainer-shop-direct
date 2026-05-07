@@ -19,6 +19,14 @@ export type FinanceEntry = {
 };
 
 const KEY = "pkmn_finance_v1";
+const listeners = new Set<() => void>();
+
+if (typeof window !== "undefined") {
+  window.addEventListener("cloud-sync-key", ((event: Event) => {
+    const key = (event as CustomEvent<{ key?: string }>).detail?.key;
+    if (key === KEY) listeners.forEach((cb) => cb());
+  }) as EventListener);
+}
 
 export function getFinance(): FinanceEntry[] {
   if (typeof window === "undefined") return [];
@@ -28,7 +36,9 @@ export function getFinance(): FinanceEntry[] {
 }
 export function saveFinance(list: FinanceEntry[]) {
   localStorage.setItem(KEY, JSON.stringify(list));
+  listeners.forEach((cb) => cb());
 }
+export function subscribeFinance(cb: () => void) { listeners.add(cb); return () => listeners.delete(cb); }
 export function upsertFinance(e: FinanceEntry) {
   const list = getFinance();
   const i = list.findIndex(x => x.id === e.id);
