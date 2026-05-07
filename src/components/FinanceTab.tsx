@@ -370,7 +370,6 @@ function FinanceForm({ entry, cats, onClose, onSave }: { entry: FinanceEntry; ca
             </F>
           </div>
           <F label="Observações"><textarea rows={2} value={data.notes ?? ""} onChange={(e) => set("notes", e.target.value)} className="finput" /></F>
-          <F label="Observações"><textarea rows={2} value={data.notes ?? ""} onChange={(e) => set("notes", e.target.value)} className="finput" /></F>
           <label className="flex items-center gap-2 rounded-lg border border-border bg-background/40 p-3">
             <input type="checkbox" checked={data.sold} onChange={(e) => set("sold", e.target.checked)} />
             <span className="text-sm font-semibold">✅ Já vendido (considerar lucro realizado)</span>
