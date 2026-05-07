@@ -502,6 +502,7 @@ function RankList({ title, items }: { title: string; items: { name: string; coun
 
 function ProductForm({ product, categories, onClose, onSave }: { product: Product; categories: CategoryDef[]; onClose: () => void; onSave: (p: Product) => void }) {
   const [data, setData] = useState<Product>(product);
+  const collections = useGetCollections();
   const [uploading, setUploading] = useState(false);
 
   const compress = (file: File) => new Promise<string>((resolve, reject) => {
