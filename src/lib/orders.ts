@@ -58,6 +58,14 @@ export type Order = {
 };
 
 const KEY = "pkmn_orders_v1";
+const listeners = new Set<() => void>();
+
+if (typeof window !== "undefined") {
+  window.addEventListener("cloud-sync-key", ((event: Event) => {
+    const key = (event as CustomEvent<{ key?: string }>).detail?.key;
+    if (key === KEY) listeners.forEach((cb) => cb());
+  }) as EventListener);
+}
 
 export function getOrders(): Order[] {
   if (typeof window === "undefined") return [];
@@ -67,7 +75,6 @@ function save(list: Order[]) {
   localStorage.setItem(KEY, JSON.stringify(list));
   listeners.forEach(cb => cb());
 }
-const listeners = new Set<() => void>();
 export function subscribeOrders(cb: () => void) { listeners.add(cb); return () => { listeners.delete(cb); }; }
 
 export function createOrder(o: Omit<Order, "id" | "code" | "status" | "history" | "createdAt" | "updatedAt">): Order {
