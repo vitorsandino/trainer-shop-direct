@@ -3,7 +3,7 @@ import { getCurrentUser, subscribeAuth, type User } from "@/lib/auth";
 import { cartCount, subscribeCart } from "@/lib/cart";
 
 export function useAuth() {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<User | null | undefined>(undefined);
   useEffect(() => {
     setUser(getCurrentUser());
     return subscribeAuth(() => setUser(getCurrentUser()));
