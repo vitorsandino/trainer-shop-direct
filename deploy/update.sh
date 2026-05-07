@@ -8,7 +8,7 @@ PORT="${PORT:-3000}"
 cd "${APP_DIR}"
 git pull --ff-only
 bun install
-npm install --no-save --prefix "${APP_DIR}" miniflare@^4
+npm install --no-save --prefix "${APP_DIR}" miniflare@^4 wrangler@^4
 bun run build
 
 if [ ! -f "${APP_DIR}/dist/server/index.js" ]; then
