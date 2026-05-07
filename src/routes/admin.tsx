@@ -13,6 +13,8 @@ import {
 } from "lucide-react";
 import { FinanceTab } from "@/components/FinanceTab";
 import { OrdersTab } from "@/components/OrdersTab";
+import { BackupTab } from "@/components/BackupTab";
+import { Database } from "lucide-react";
 
 const ADMIN_USER = "admin";
 const ADMIN_PASSWORD = "s3n4@123";
@@ -22,7 +24,7 @@ export const Route = createFileRoute("/admin")({
   component: AdminPage,
 });
 
-type Tab = "products" | "categories" | "collections" | "orders" | "analytics" | "finance";
+type Tab = "products" | "categories" | "collections" | "orders" | "analytics" | "finance" | "backup";
 
 function AdminPage() {
   const [authed, setAuthed] = useState(false);
@@ -74,6 +76,7 @@ function AdminDashboard({ onLogout }: { onLogout: () => void }) {
     { id: "orders", label: "Pedidos", icon: ShoppingBag },
     { id: "analytics", label: "Acessos", icon: BarChart3 },
     { id: "finance", label: "Financeiro", icon: Wallet },
+    { id: "backup", label: "Backup", icon: Database },
   ];
 
   return (
@@ -111,6 +114,7 @@ function AdminDashboard({ onLogout }: { onLogout: () => void }) {
           {tab === "orders" && <OrdersTab />}
           {tab === "analytics" && <AnalyticsTab />}
           {tab === "finance" && <FinanceTab />}
+          {tab === "backup" && <BackupTab />}
         </div>
       </div>
     </div>
