@@ -129,10 +129,7 @@ const seed: Product[] = [];
 export function getProducts(): Product[] {
   if (typeof window === "undefined") return seed;
   const raw = localStorage.getItem(KEY);
-  if (!raw) {
-    localStorage.setItem(KEY, JSON.stringify(seed));
-    return seed;
-  }
+  if (!raw) return seed; // NÃO semeia no localStorage — evita cloud-sync apagar produtos da nuvem
   try { return JSON.parse(raw); } catch { return seed; }
 }
 
