@@ -1,6 +1,7 @@
 import { createFileRoute, Link, useNavigate, useSearch } from "@tanstack/react-router";
 import { useState } from "react";
 import { resetPassword } from "@/lib/email.functions";
+import { resetPasswordByEmail } from "@/lib/auth";
 
 type Search = { token?: string };
 
@@ -21,16 +22,29 @@ function ResetPage() {
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErr("");
-    if (!token) { setErr("Link inválido"); return; }
-    if (pw.length < 6) { setErr("A senha precisa ter pelo menos 6 caracteres"); return; }
-    if (pw !== pw2) { setErr("As senhas não conferem"); return; }
+    if (!token) {
+      setErr("Link inválido");
+      return;
+    }
+    if (pw.length < 6) {
+      setErr("A senha precisa ter pelo menos 6 caracteres");
+      return;
+    }
+    if (pw !== pw2) {
+      setErr("As senhas não conferem");
+      return;
+    }
     setBusy(true);
     try {
-      await resetPassword({ data: { token, newPassword: pw } });
+      const result = await resetPassword({ data: { token } });
+      await resetPasswordByEmail(result.email, pw);
       setDone(true);
       setTimeout(() => navigate({ to: "/login" }), 2000);
-    } catch (e: any) { setErr(e?.message ?? "Erro ao redefinir"); }
-    finally { setBusy(false); }
+    } catch (e: any) {
+      setErr(e?.message ?? "Erro ao redefinir");
+    } finally {
+      setBusy(false);
+    }
   };
 
   return (
