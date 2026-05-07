@@ -14,6 +14,7 @@ import { getSupabase } from "./supabase-client";
 const SYNC_PREFIX = "pkmn_";
 const TABLE = "app_kv";
 const SYNCABLE_KEYS = new Set([
+  "pkmn_users_v1",
   "pkmn_products_v2",
   "pkmn_categories_v1",
   "pkmn_collections_v1",
