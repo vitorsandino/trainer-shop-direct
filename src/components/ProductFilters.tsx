@@ -1,4 +1,4 @@
-import { CATEGORIES, type Category, type Product } from "@/lib/products";
+import { CATEGORIES, type Category, type Product, productCategories } from "@/lib/products";
 import { SlidersHorizontal, X } from "lucide-react";
 import { useMemo, useState } from "react";
 
@@ -30,8 +30,8 @@ export function applyFilters(products: Product[], f: FilterState, opts?: { locke
   const min = f.minPrice ? parseFloat(f.minPrice) : -Infinity;
   const max = f.maxPrice ? parseFloat(f.maxPrice) : Infinity;
   return products
-    .filter(p => (opts?.lockedCategory ? p.category === opts.lockedCategory : true))
-    .filter(p => (f.categories.length ? f.categories.includes(p.category) : true))
+    .filter(p => (opts?.lockedCategory ? productCategories(p).includes(opts.lockedCategory) : true))
+    .filter(p => (f.categories.length ? productCategories(p).some(c => f.categories.includes(c)) : true))
     .filter(p => p.price >= min && p.price <= max)
     .filter(p => (f.inStock ? (p.stock ?? 0) > 0 : true))
     .sort((a, b) => {
