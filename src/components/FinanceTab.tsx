@@ -335,7 +335,15 @@ function FinanceForm({ entry, cats, onClose, onSave }: { entry: FinanceEntry; ca
           <button onClick={onClose} className="rounded p-1 hover:bg-background"><X className="h-5 w-5" /></button>
         </div>
         <form onSubmit={(e) => { e.preventDefault(); onSave(data); }} className="space-y-4">
-          {products.length > 0 && (
+          <label className="flex items-center gap-2 rounded-lg border border-primary/40 bg-primary/5 p-3">
+            <input type="checkbox" checked={!!data.expenseOnly} onChange={(e) => {
+              const v = e.target.checked;
+              setData(d => ({ ...d, expenseOnly: v, price: v ? 0 : d.price, feePercent: v ? 0 : d.feePercent, sold: v ? false : d.sold, status: v ? "estoque" : d.status }));
+            }} />
+            <span className="text-sm font-semibold">💸 Apenas saída (frete, embalagem, brinde) — conta como investimento</span>
+          </label>
+
+          {!data.expenseOnly && products.length > 0 && (
             <F label="Vincular a produto cadastrado (opcional)">
               <select value={data.productId ?? ""} onChange={(e) => linkProduct(e.target.value)} className="finput">
                 <option value="">— Nenhum (manual) —</option>
@@ -344,45 +352,78 @@ function FinanceForm({ entry, cats, onClose, onSave }: { entry: FinanceEntry; ca
             </F>
           )}
           <div className="grid gap-4 sm:grid-cols-2">
-            <F label="Nome do produto">
-              <input required value={data.name} onChange={(e) => set("name", e.target.value)} className="finput" />
+            <F label={data.expenseOnly ? "Descrição da saída" : "Nome do produto"}>
+              <input required value={data.name} onChange={(e) => set("name", e.target.value)} className="finput" placeholder={data.expenseOnly ? "Ex: Frete Correios, Embalagens, Brinde..." : ""} />
             </F>
-            <F label="Categoria">
-              <select value={data.category} onChange={(e) => set("category", e.target.value)} className="finput">
-                {cats.map(cc => <option key={cc.value} value={cc.value}>{cc.label}</option>)}
-              </select>
-            </F>
+            {data.expenseOnly ? (
+              <F label="Tipo de saída">
+                <select value={data.expenseKind ?? "frete"} onChange={(e) => set("expenseKind", e.target.value)} className="finput">
+                  <option value="frete">Frete</option>
+                  <option value="embalagem">Embalagem</option>
+                  <option value="brinde">Brinde</option>
+                  <option value="material">Material/Insumo</option>
+                  <option value="outro">Outro</option>
+                </select>
+              </F>
+            ) : (
+              <F label="Categoria">
+                <select value={data.category} onChange={(e) => set("category", e.target.value)} className="finput">
+                  {cats.map(cc => <option key={cc.value} value={cc.value}>{cc.label}</option>)}
+                </select>
+              </F>
+            )}
           </div>
-          <div className="grid gap-4 sm:grid-cols-3">
-            <F label="Quantidade"><input type="number" min="1" value={data.quantity} onChange={(e) => set("quantity", +e.target.value || 0)} className="finput" /></F>
-            <F label="Custo unitário (R$)"><input type="number" step="0.01" value={data.cost} onChange={(e) => set("cost", +e.target.value || 0)} className="finput" /></F>
-            <F label="Preço de venda (R$)"><input type="number" step="0.01" value={data.price} onChange={(e) => set("price", +e.target.value || 0)} className="finput" /></F>
-          </div>
-          <div className="grid gap-4 sm:grid-cols-3">
-            <F label="Taxa marketplace (%)"><input type="number" step="0.1" value={data.feePercent} onChange={(e) => set("feePercent", +e.target.value || 0)} className="finput" /></F>
-            <F label="Frete por unidade (R$)"><input type="number" step="0.01" value={data.shipping} onChange={(e) => set("shipping", +e.target.value || 0)} className="finput" /></F>
-            <F label="Status">
-              <select value={data.status} onChange={(e) => set("status", e.target.value as FinanceStatus)} className="finput">
-                <option value="estoque">Em estoque</option>
-                <option value="vendido">Vendido</option>
-                <option value="reservado">Reservado</option>
-              </select>
-            </F>
-          </div>
+          {data.expenseOnly ? (
+            <div className="grid gap-4 sm:grid-cols-2">
+              <F label="Quantidade"><input type="number" min="1" value={data.quantity} onChange={(e) => set("quantity", +e.target.value || 0)} className="finput" /></F>
+              <F label="Valor unitário (R$)"><input type="number" step="0.01" value={data.cost} onChange={(e) => set("cost", +e.target.value || 0)} className="finput" /></F>
+            </div>
+          ) : (
+            <>
+              <div className="grid gap-4 sm:grid-cols-3">
+                <F label="Quantidade"><input type="number" min="1" value={data.quantity} onChange={(e) => set("quantity", +e.target.value || 0)} className="finput" /></F>
+                <F label="Custo unitário (R$)"><input type="number" step="0.01" value={data.cost} onChange={(e) => set("cost", +e.target.value || 0)} className="finput" /></F>
+                <F label="Preço de venda (R$)"><input type="number" step="0.01" value={data.price} onChange={(e) => set("price", +e.target.value || 0)} className="finput" /></F>
+              </div>
+              <div className="grid gap-4 sm:grid-cols-3">
+                <F label="Taxa marketplace (%)"><input type="number" step="0.1" value={data.feePercent} onChange={(e) => set("feePercent", +e.target.value || 0)} className="finput" /></F>
+                <F label="Frete por unidade (R$)"><input type="number" step="0.01" value={data.shipping} onChange={(e) => set("shipping", +e.target.value || 0)} className="finput" /></F>
+                <F label="Status">
+                  <select value={data.status} onChange={(e) => set("status", e.target.value as FinanceStatus)} className="finput">
+                    <option value="estoque">Em estoque</option>
+                    <option value="vendido">Vendido</option>
+                    <option value="reservado">Reservado</option>
+                  </select>
+                </F>
+              </div>
+            </>
+          )}
           <F label="Observações"><textarea rows={2} value={data.notes ?? ""} onChange={(e) => set("notes", e.target.value)} className="finput" /></F>
-          <label className="flex items-center gap-2 rounded-lg border border-border bg-background/40 p-3">
-            <input type="checkbox" checked={data.sold} onChange={(e) => set("sold", e.target.checked)} />
-            <span className="text-sm font-semibold">✅ Já vendido (considerar lucro realizado)</span>
-          </label>
+          {!data.expenseOnly && (
+            <label className="flex items-center gap-2 rounded-lg border border-border bg-background/40 p-3">
+              <input type="checkbox" checked={data.sold} onChange={(e) => set("sold", e.target.checked)} />
+              <span className="text-sm font-semibold">✅ Já vendido (considerar lucro realizado)</span>
+            </label>
+          )}
 
           {/* Resumo em tempo real */}
           <div className="grid grid-cols-2 gap-3 rounded-lg border border-border bg-background/40 p-4 sm:grid-cols-3">
-            <Mini label="Lucro bruto un." value={formatPrice(c.grossUnit)} />
-            <Mini label="Lucro líquido un." value={formatPrice(c.netUnit)} positive={c.netUnit >= 0} />
-            <Mini label="Margem" value={`${c.marginPercent.toFixed(1)}%`} positive={c.marginPercent >= 0} />
-            <Mini label="Investimento" value={formatPrice(c.invest)} />
-            <Mini label="Retorno estimado" value={formatPrice(c.revenue)} />
-            <Mini label="Lucro total" value={formatPrice(c.totalProfit)} positive={c.totalProfit >= 0} />
+            {data.expenseOnly ? (
+              <>
+                <Mini label="Valor unitário" value={formatPrice(data.cost)} />
+                <Mini label="Quantidade" value={String(data.quantity)} />
+                <Mini label="Total investido (saída)" value={formatPrice(c.invest)} positive={false} />
+              </>
+            ) : (
+              <>
+                <Mini label="Lucro bruto un." value={formatPrice(c.grossUnit)} />
+                <Mini label="Lucro líquido un." value={formatPrice(c.netUnit)} positive={c.netUnit >= 0} />
+                <Mini label="Margem" value={`${c.marginPercent.toFixed(1)}%`} positive={c.marginPercent >= 0} />
+                <Mini label="Investimento" value={formatPrice(c.invest)} />
+                <Mini label="Retorno estimado" value={formatPrice(c.revenue)} />
+                <Mini label="Lucro total" value={formatPrice(c.totalProfit)} positive={c.totalProfit >= 0} />
+              </>
+            )}
           </div>
 
           <div className="flex gap-2 pt-2">
