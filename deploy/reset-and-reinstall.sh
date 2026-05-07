@@ -101,10 +101,18 @@ fi
 echo "==> [7/8] Configurando Nginx (proxy reverso)"
 rm -f /etc/nginx/sites-enabled/default /etc/nginx/sites-available/default
 cat > /etc/nginx/sites-available/${APP_NAME} <<NGINX
+# Redireciona www -> domínio raiz (HTTP e HTTPS)
+server {
+    listen 80;
+    listen [::]:80;
+    server_name www.${DOMAIN};
+    return 301 https://${DOMAIN}\$request_uri;
+}
+
 server {
     listen 80 default_server;
     listen [::]:80 default_server;
-    server_name ${DOMAIN} www.${DOMAIN};
+    server_name ${DOMAIN};
 
     client_max_body_size 25m;
 
