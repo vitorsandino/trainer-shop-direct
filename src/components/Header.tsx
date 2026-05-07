@@ -74,9 +74,9 @@ export function Header() {
               Cartas
             </Link>
 
-            <a href={`https://wa.me/${WHATSAPP_NUMBER}`} target="_blank" rel="noopener noreferrer" className="rounded-md px-3 py-2 text-sm font-medium text-foreground/80 hover:text-primary">
+            <Link to="/contato" className="rounded-md px-3 py-2 text-sm font-medium text-foreground/80 hover:text-primary">
               Contato
-            </a>
+            </Link>
           </nav>
 
           <form onSubmit={submit} className="ml-auto hidden flex-1 max-w-sm md:block">
@@ -122,6 +122,7 @@ export function Header() {
             <div className="grid grid-cols-2 gap-2">
               <Link to="/categoria/$slug" params={{ slug: "booster" }} onClick={() => setOpen(false)} className="rounded-md bg-muted px-3 py-2 text-sm">Boosters</Link>
               <Link to="/categoria/$slug" params={{ slug: "avulsas" }} onClick={() => setOpen(false)} className="rounded-md bg-muted px-3 py-2 text-sm">Cartas</Link>
+              <Link to="/contato" onClick={() => setOpen(false)} className="rounded-md bg-muted px-3 py-2 text-sm">Contato</Link>
             </div>
             <Link to="/carrinho" onClick={() => setOpen(false)} className="flex items-center justify-between rounded-md bg-secondary px-3 py-2 text-sm font-semibold text-secondary-foreground">
               <span className="inline-flex items-center gap-2"><ShoppingCart className="h-4 w-4" /> Carrinho</span>
