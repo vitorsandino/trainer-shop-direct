@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Trash2, Minus, Plus, ShoppingBag } from "lucide-react";
-import { getCartLines, removeFromCart, setQty, subscribeCart } from "@/lib/cart";
+import { getCartLines, removeFromCart, setQty, subscribeCart, reconcileCartWithStock } from "@/lib/cart";
 import { formatPrice } from "@/lib/products";
 
 export const Route = createFileRoute("/carrinho")({
@@ -12,6 +12,7 @@ function CartPage() {
   const navigate = useNavigate();
   const [data, setData] = useState(() => getCartLines());
   useEffect(() => {
+    reconcileCartWithStock();
     setData(getCartLines());
     return subscribeCart(() => setData(getCartLines()));
   }, []);
