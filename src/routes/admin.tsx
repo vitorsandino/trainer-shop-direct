@@ -69,6 +69,7 @@ function AdminDashboard({ onLogout }: { onLogout: () => void }) {
   const tabs: { id: Tab; label: string; icon: typeof Package }[] = [
     { id: "products", label: "Produtos", icon: Package },
     { id: "categories", label: "Categorias", icon: Tag },
+    { id: "collections", label: "Coleções", icon: Layers },
     { id: "analytics", label: "Acessos", icon: BarChart3 },
     { id: "finance", label: "Financeiro", icon: Wallet },
   ];
@@ -104,6 +105,7 @@ function AdminDashboard({ onLogout }: { onLogout: () => void }) {
         <div className="min-w-0">
           {tab === "products" && <ProductsTab />}
           {tab === "categories" && <CategoriesTab />}
+          {tab === "collections" && <CollectionsTab />}
           {tab === "analytics" && <AnalyticsTab />}
           {tab === "finance" && <FinanceTab />}
         </div>
