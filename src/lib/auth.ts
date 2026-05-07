@@ -12,6 +12,14 @@ export type User = {
 
 const USERS_KEY = "pkmn_users_v1";
 const SESSION_KEY = "pkmn_session_v1";
+const listeners = new Set<() => void>();
+
+if (typeof window !== "undefined") {
+  window.addEventListener("cloud-sync-key", ((event: Event) => {
+    const key = (event as CustomEvent<{ key?: string }>).detail?.key;
+    if (key === USERS_KEY || key === SESSION_KEY) listeners.forEach((cb) => cb());
+  }) as EventListener);
+}
 
 async function sha256(s: string) {
   const buf = new TextEncoder().encode(s);
@@ -25,7 +33,6 @@ export function getUsers(): User[] {
 }
 function saveUsers(list: User[]) { localStorage.setItem(USERS_KEY, JSON.stringify(list)); }
 
-const listeners = new Set<() => void>();
 export function subscribeAuth(cb: () => void) { listeners.add(cb); return () => { listeners.delete(cb); }; }
 function emit() { listeners.forEach(cb => cb()); }
 

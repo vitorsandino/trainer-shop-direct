@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { Sparkles } from "lucide-react";
 import { useEffect, useState } from "react";
-import { getProducts, type Product, formatPrice } from "@/lib/products";
+import { getProducts, subscribeProducts, type Product, formatPrice } from "@/lib/products";
 
 const GRADIENTS = [
   "from-fuchsia-600 via-purple-700 to-indigo-900",
@@ -15,7 +15,9 @@ const GRADIENTS = [
 export function CollectionsShowcase() {
   const [items, setItems] = useState<Product[]>([]);
   useEffect(() => {
-    setItems(getProducts().filter((p) => p.banner));
+    const refresh = () => setItems(getProducts().filter((p) => p.banner));
+    refresh();
+    return subscribeProducts(refresh);
   }, []);
 
   if (items.length === 0) return null;

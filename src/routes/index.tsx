@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Truck, ShieldCheck, MessageCircle, Sparkles } from "lucide-react";
-import { CATEGORIES, getProducts, type Product, whatsappLink } from "@/lib/products";
+import { CATEGORIES, getProducts, subscribeProducts, type Product, whatsappLink } from "@/lib/products";
 import { ProductCard } from "@/components/ProductCard";
 import { CollectionsShowcase } from "@/components/CollectionsShowcase";
 
@@ -11,7 +11,11 @@ export const Route = createFileRoute("/")({
 
 function Index() {
   const [products, setProducts] = useState<Product[]>([]);
-  useEffect(() => setProducts(getProducts()), []);
+  useEffect(() => {
+    const refresh = () => setProducts(getProducts());
+    refresh();
+    return subscribeProducts(refresh);
+  }, []);
   const featured = products.filter(p => p.featured).slice(0, 8);
   const latest = [...products].sort((a, b) => b.createdAt - a.createdAt).slice(0, 8);
 

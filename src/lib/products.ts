@@ -10,6 +10,9 @@ const DEFAULT_CATEGORIES: CategoryDef[] = [
 ];
 
 const CAT_KEY = "pkmn_categories_v1";
+const PRODUCTS_KEY = "pkmn_products_v2";
+const COLLECTIONS_KEY = "pkmn_collections_v1";
+const ANALYTICS_KEY = "pkmn_analytics_v1";
 
 export function getCategories(): CategoryDef[] {
   if (typeof window === "undefined") return DEFAULT_CATEGORIES;
@@ -24,7 +27,18 @@ export function getCategories(): CategoryDef[] {
 const catListeners = new Set<() => void>();
 export function subscribeCategories(cb: () => void) {
   catListeners.add(cb);
-  return () => catListeners.delete(cb);
+  return () => {
+    catListeners.delete(cb);
+  };
+}
+if (typeof window !== "undefined") {
+  window.addEventListener("cloud-sync-key", ((event: Event) => {
+    const key = (event as CustomEvent<{ key?: string }>).detail?.key;
+    if (key === CAT_KEY) catListeners.forEach((cb) => cb());
+    if (key === COLLECTIONS_KEY) collListeners.forEach((cb) => cb());
+    if (key === PRODUCTS_KEY) productListeners.forEach((cb) => cb());
+    if (key === ANALYTICS_KEY) analyticsListeners.forEach((cb) => cb());
+  }) as EventListener);
 }
 export function saveCategories(list: CategoryDef[]) {
   localStorage.setItem(CAT_KEY, JSON.stringify(list));
@@ -80,7 +94,12 @@ export function getCollections(): CollectionDef[] {
   try { return JSON.parse(raw); } catch { return DEFAULT_COLLECTIONS; }
 }
 const collListeners = new Set<() => void>();
-export function subscribeCollections(cb: () => void) { collListeners.add(cb); return () => collListeners.delete(cb); }
+export function subscribeCollections(cb: () => void) {
+  collListeners.add(cb);
+  return () => {
+    collListeners.delete(cb);
+  };
+}
 export function saveCollections(list: CollectionDef[]) {
   localStorage.setItem(COLL_KEY, JSON.stringify(list));
   collListeners.forEach(cb => cb());
@@ -98,7 +117,15 @@ export function discountPercent(p: Pick<Product, "price" | "originalPrice">): nu
   return Math.round(((p.originalPrice - p.price) / p.originalPrice) * 100);
 }
 
-const KEY = "pkmn_products_v2";
+const KEY = PRODUCTS_KEY;
+const productListeners = new Set<() => void>();
+
+export function subscribeProducts(cb: () => void) {
+  productListeners.add(cb);
+  return () => {
+    productListeners.delete(cb);
+  };
+}
 
 const seed: Product[] = [];
 
@@ -114,6 +141,7 @@ export function getProducts(): Product[] {
 
 export function saveProducts(list: Product[]) {
   localStorage.setItem(KEY, JSON.stringify(list));
+  productListeners.forEach((cb) => cb());
 }
 
 export function upsertProduct(p: Product) {
@@ -142,7 +170,6 @@ export function formatPrice(n: number) {
 }
 
 // ---- Analytics (local) ----
-const ANALYTICS_KEY = "pkmn_analytics_v1";
 type AnalyticsData = {
   visits: number;
   pageViews: Record<string, number>;
@@ -165,6 +192,15 @@ export function getAnalytics(): AnalyticsData {
 
 function saveAnalytics(d: AnalyticsData) {
   localStorage.setItem(ANALYTICS_KEY, JSON.stringify(d));
+  analyticsListeners.forEach((cb) => cb());
+}
+
+const analyticsListeners = new Set<() => void>();
+export function subscribeAnalytics(cb: () => void) {
+  analyticsListeners.add(cb);
+  return () => {
+    analyticsListeners.delete(cb);
+  };
 }
 
 export function trackPageView(path: string) {

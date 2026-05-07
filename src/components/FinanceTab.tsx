@@ -3,7 +3,7 @@ import { Plus, Trash2, Pencil, X, Download, FileSpreadsheet, DollarSign, Trendin
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, LineChart, Line, PieChart, Pie, Cell, Legend } from "recharts";
 import {
   type FinanceEntry, type FinanceStatus,
-  getFinance, upsertFinance, deleteFinance, calc, exportCSV, exportXLS, downloadFile,
+  getFinance, upsertFinance, deleteFinance, calc, exportCSV, exportXLS, downloadFile, subscribeFinance,
 } from "@/lib/finance";
 import { getProducts, getCategories, formatPrice, type CategoryDef } from "@/lib/products";
 
@@ -18,7 +18,10 @@ export function FinanceTab() {
 
   const cats = useGetCats();
   const refresh = () => setList(getFinance());
-  useEffect(() => { refresh(); }, []);
+  useEffect(() => {
+    refresh();
+    return subscribeFinance(refresh);
+  }, []);
 
   const filtered = useMemo(() => {
     let arr = list.filter(e => e.name.toLowerCase().includes(q.toLowerCase()));
