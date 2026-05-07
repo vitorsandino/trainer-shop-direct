@@ -26,7 +26,7 @@ export function disablePush() { pushEnabled = false; }
 
 const statusListeners = new Set<(s: SyncStatus) => void>();
 export type SyncStatus = "idle" | "pulling" | "pushing" | "error" | "offline";
-let currentStatus: SyncStatus = "offline";
+let currentStatus: SyncStatus = "idle";
 
 function setStatus(s: SyncStatus) {
   currentStatus = s;
