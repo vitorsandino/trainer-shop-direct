@@ -13,8 +13,9 @@ import {
 } from "lucide-react";
 import { FinanceTab } from "@/components/FinanceTab";
 import { OrdersTab } from "@/components/OrdersTab";
-import { BackupTab } from "@/components/BackupTab";
-import { Database } from "lucide-react";
+import { CloudTab } from "@/components/CloudTab";
+import { Cloud } from "lucide-react";
+import { enablePush, disablePush } from "@/lib/cloud-sync";
 
 const ADMIN_USER = "admin";
 const ADMIN_PASSWORD = "s3n4@123";
@@ -24,7 +25,7 @@ export const Route = createFileRoute("/admin")({
   component: AdminPage,
 });
 
-type Tab = "products" | "categories" | "collections" | "orders" | "analytics" | "finance" | "backup";
+type Tab = "products" | "categories" | "collections" | "orders" | "analytics" | "finance" | "cloud";
 
 function AdminPage() {
   const [authed, setAuthed] = useState(false);
@@ -33,7 +34,7 @@ function AdminPage() {
   const [err, setErr] = useState("");
 
   useEffect(() => {
-    if (sessionStorage.getItem(AUTH_KEY) === "1") setAuthed(true);
+    if (sessionStorage.getItem(AUTH_KEY) === "1") { setAuthed(true); enablePush(); }
   }, []);
 
   if (!authed) {
@@ -46,7 +47,7 @@ function AdminPage() {
             onSubmit={(e) => {
               e.preventDefault();
               if (user === ADMIN_USER && pwd === ADMIN_PASSWORD) {
-                sessionStorage.setItem(AUTH_KEY, "1"); setAuthed(true);
+                sessionStorage.setItem(AUTH_KEY, "1"); setAuthed(true); enablePush();
               } else setErr("Usuário ou senha incorretos");
             }}
             className="space-y-3"
@@ -63,7 +64,7 @@ function AdminPage() {
     );
   }
 
-  return <AdminDashboard onLogout={() => { sessionStorage.removeItem(AUTH_KEY); setAuthed(false); }} />;
+  return <AdminDashboard onLogout={() => { sessionStorage.removeItem(AUTH_KEY); disablePush(); setAuthed(false); }} />;
 }
 
 function AdminDashboard({ onLogout }: { onLogout: () => void }) {
@@ -76,7 +77,7 @@ function AdminDashboard({ onLogout }: { onLogout: () => void }) {
     { id: "orders", label: "Pedidos", icon: ShoppingBag },
     { id: "analytics", label: "Acessos", icon: BarChart3 },
     { id: "finance", label: "Financeiro", icon: Wallet },
-    { id: "backup", label: "Backup", icon: Database },
+    { id: "cloud", label: "Nuvem", icon: Cloud },
   ];
 
   return (
@@ -114,7 +115,7 @@ function AdminDashboard({ onLogout }: { onLogout: () => void }) {
           {tab === "orders" && <OrdersTab />}
           {tab === "analytics" && <AnalyticsTab />}
           {tab === "finance" && <FinanceTab />}
-          {tab === "backup" && <BackupTab />}
+          {tab === "cloud" && <CloudTab />}
         </div>
       </div>
     </div>
