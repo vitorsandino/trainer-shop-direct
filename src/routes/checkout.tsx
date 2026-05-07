@@ -16,7 +16,7 @@ function CheckoutPage() {
   const [data, setData] = useState(() => getCartLines());
   const [busy, setBusy] = useState(false);
 
-  useEffect(() => { setData(getCartLines()); }, []);
+  useEffect(() => { reconcileCartWithStock(); setData(getCartLines()); }, []);
 
   const [addr, setAddr] = useState<OrderAddress>({
     fullName: "", phone: "", zip: "", street: "", number: "", complement: "",
