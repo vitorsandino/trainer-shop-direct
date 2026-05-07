@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Atualiza a aplicação a partir do GitHub
 set -euo pipefail
-APP_NAME="${APP_NAME:-app}"
+APP_NAME="${APP_NAME:-trainer-shop-direct}"
 APP_DIR="/var/www/${APP_NAME}"
 
 cd "${APP_DIR}"
