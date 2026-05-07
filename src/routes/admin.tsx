@@ -317,6 +317,91 @@ function CategoriesTab() {
   );
 }
 
+/* ============================== COLLECTIONS ============================== */
+
+function useGetCollections() {
+  const [list, setList] = useState<CollectionDef[]>(() => (typeof window !== "undefined" ? getCollections() : []));
+  useEffect(() => {
+    const unsub = subscribeCollections(() => setList(getCollections()));
+    return () => { unsub; };
+  }, []);
+  return list;
+}
+
+function CollectionsTab() {
+  const items = useGetCollections();
+  const [name, setName] = useState("");
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editName, setEditName] = useState("");
+
+  const add = () => {
+    const label = name.trim();
+    if (!label) return;
+    const value = slugify(label);
+    if (items.some(c => c.value === value)) { alert("Coleção já existe"); return; }
+    saveCollections([...items, { value, label }]);
+    setName("");
+  };
+  const remove = (value: string) => {
+    if (!confirm("Excluir esta coleção? Os produtos não serão removidos.")) return;
+    saveCollections(items.filter(c => c.value !== value));
+  };
+  const startEdit = (c: CollectionDef) => { setEditingId(c.value); setEditName(c.label); };
+  const saveEdit = () => {
+    if (!editingId) return;
+    saveCollections(items.map(c => c.value === editingId ? { ...c, label: editName.trim() || c.label } : c));
+    setEditingId(null);
+  };
+
+  return (
+    <div className="space-y-4">
+      <div className="rounded-lg border border-border bg-card p-5">
+        <h2 className="mb-3 font-display text-lg">Nova coleção</h2>
+        <form onSubmit={(e) => { e.preventDefault(); add(); }} className="flex gap-2">
+          <input
+            value={name} onChange={(e) => setName(e.target.value)}
+            placeholder="Ex: Escarlate & Violeta — 151"
+            className="flex-1 rounded-md border border-border bg-input px-3 py-2 text-sm outline-none focus:border-primary"
+          />
+          <button className="flex items-center gap-1 rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:opacity-90">
+            <Plus className="h-4 w-4" /> Adicionar
+          </button>
+        </form>
+      </div>
+      <div className="rounded-lg border border-border bg-card">
+        <div className="border-b border-border p-4">
+          <h2 className="font-display text-lg">Coleções ({items.length})</h2>
+        </div>
+        <ul className="divide-y divide-border">
+          {items.map(c => (
+            <li key={c.value} className="flex items-center gap-3 p-4">
+              <Layers className="h-4 w-4 text-muted-foreground" />
+              {editingId === c.value ? (
+                <>
+                  <input value={editName} onChange={(e) => setEditName(e.target.value)}
+                    className="flex-1 rounded border border-border bg-input px-2 py-1 text-sm" autoFocus />
+                  <button onClick={saveEdit} className="rounded bg-primary px-3 py-1 text-xs font-semibold text-primary-foreground">Salvar</button>
+                  <button onClick={() => setEditingId(null)} className="rounded border border-border px-3 py-1 text-xs">Cancelar</button>
+                </>
+              ) : (
+                <>
+                  <div className="flex-1">
+                    <p className="font-medium">{c.label}</p>
+                    <p className="text-xs text-muted-foreground">slug: {c.value}</p>
+                  </div>
+                  <button onClick={() => startEdit(c)} className="rounded p-1.5 text-secondary hover:bg-secondary/10"><Pencil className="h-4 w-4" /></button>
+                  <button onClick={() => remove(c.value)} className="rounded p-1.5 text-destructive hover:bg-destructive/10"><Trash2 className="h-4 w-4" /></button>
+                </>
+              )}
+            </li>
+          ))}
+          {items.length === 0 && <li className="p-8 text-center text-muted-foreground">Nenhuma coleção</li>}
+        </ul>
+      </div>
+    </div>
+  );
+}
+
 /* ============================== ANALYTICS ============================== */
 
 function AnalyticsTab() {
