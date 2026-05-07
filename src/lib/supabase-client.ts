@@ -1,5 +1,5 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
-import { getSupabaseConfig } from "@/server/supabase-config.functions";
+import { getSupabaseConfig } from "@/lib/supabase-config.functions";
 
 let clientPromise: Promise<SupabaseClient | null> | null = null;
 
