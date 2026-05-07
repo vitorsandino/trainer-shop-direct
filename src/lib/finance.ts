@@ -10,6 +10,8 @@ export type FinanceEntry = {
   price: number;       // preço de venda
   feePercent: number;  // taxa marketplace %
   shipping: number;    // frete por unidade
+  packaging?: number;  // custo de embalagem por unidade
+  gift?: number;       // custo de brinde por unidade
   notes?: string;
   status: FinanceStatus;
   sold: boolean;       // já vendido (lucro realizado)
