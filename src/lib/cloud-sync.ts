@@ -235,5 +235,15 @@ export async function initCloudSync(): Promise<{ ok: boolean; pulled: number; er
     }
   }
   void subscribeRealtime();
+  startPolling();
   return { ok: res.ok, pulled: res.count, error: res.error };
+}
+
+let pollTimer: ReturnType<typeof setInterval> | null = null;
+function startPolling() {
+  if (pollTimer || typeof window === "undefined") return;
+  pollTimer = setInterval(() => {
+    if (document.hidden || !navigator.onLine) return;
+    pullFromCloud().catch(() => {});
+  }, 6000);
 }
