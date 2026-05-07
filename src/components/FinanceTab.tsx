@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
-import { Plus, Trash2, Pencil, X, Download, FileSpreadsheet, DollarSign, TrendingUp, Package, Percent, Wallet, Target } from "lucide-react";
+import { Plus, Trash2, Pencil, X, Download, FileSpreadsheet, DollarSign, TrendingUp, Package, Percent, Wallet, Target, Clock, ArrowDown, ArrowUp } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, LineChart, Line, PieChart, Pie, Cell, Legend } from "recharts";
 import {
   type FinanceEntry, type FinanceStatus,
   getFinance, upsertFinance, deleteFinance, calc, exportCSV, exportXLS, downloadFile, subscribeFinance,
+  daysInStock, monthlyStats, availableMonths, formatMonth,
 } from "@/lib/finance";
 import { getProducts, getCategories, formatPrice, type CategoryDef } from "@/lib/products";
 
