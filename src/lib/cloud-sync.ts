@@ -119,9 +119,11 @@ function installInterceptor() {
   };
 }
 
-/** Inicia o sync: instala o interceptor e faz pull inicial. */
+/** Inicia o sync: instala o interceptor e faz pull inicial. Push fica ativo pra todos. */
 export async function initCloudSync(): Promise<{ ok: boolean; pulled: number; error?: string }> {
   installInterceptor();
   const res = await pullFromCloud();
+  // Ativa push automático pra qualquer navegador (cadastros, pedidos, etc. sobem pra nuvem).
+  enablePush();
   return { ok: res.ok, pulled: res.count, error: res.error };
 }
