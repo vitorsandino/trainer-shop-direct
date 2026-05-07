@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Trash2, Minus, Plus, ShoppingBag } from "lucide-react";
-import { getCartLines, removeFromCart, setQty, subscribeCart } from "@/lib/cart";
+import { getCartLines, removeFromCart, setQty, subscribeCart, reconcileCartWithStock } from "@/lib/cart";
 import { formatPrice } from "@/lib/products";
 
 export const Route = createFileRoute("/carrinho")({
@@ -12,6 +12,7 @@ function CartPage() {
   const navigate = useNavigate();
   const [data, setData] = useState(() => getCartLines());
   useEffect(() => {
+    reconcileCartWithStock();
     setData(getCartLines());
     return subscribeCart(() => setData(getCartLines()));
   }, []);
@@ -32,22 +33,30 @@ function CartPage() {
       <h1 className="mb-6 font-display text-2xl md:text-3xl">Seu carrinho</h1>
       <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
         <div className="space-y-3">
-          {data.lines.map(({ product, qty, subtotal }) => (
-            <div key={product.id} className="flex gap-3 rounded-lg border border-border bg-card p-3">
-              {product.images[0] && <img src={product.images[0]} alt="" className="h-20 w-20 rounded object-cover" />}
-              <div className="min-w-0 flex-1">
-                <Link to="/produto/$id" params={{ id: product.id }} className="line-clamp-2 font-semibold hover:text-primary">{product.name}</Link>
-                <p className="text-sm text-primary">{formatPrice(product.price)}</p>
-                <div className="mt-2 flex items-center gap-2">
-                  <button onClick={() => setQty(product.id, qty - 1)} className="grid h-8 w-8 place-items-center rounded border border-border"><Minus className="h-3 w-3" /></button>
-                  <span className="w-8 text-center text-sm font-semibold">{qty}</span>
-                  <button onClick={() => setQty(product.id, qty + 1)} className="grid h-8 w-8 place-items-center rounded border border-border"><Plus className="h-3 w-3" /></button>
-                  <button onClick={() => removeFromCart(product.id)} className="ml-auto rounded p-1.5 text-destructive hover:bg-destructive/10"><Trash2 className="h-4 w-4" /></button>
+          {data.lines.map(({ product, qty, subtotal }) => {
+            const max = typeof product.stock === "number" ? product.stock : Infinity;
+            const atMax = qty >= max;
+            return (
+              <div key={product.id} className="flex gap-3 rounded-lg border border-border bg-card p-3">
+                {product.images[0] && <img src={product.images[0]} alt="" className="h-20 w-20 rounded object-cover" />}
+                <div className="min-w-0 flex-1">
+                  <Link to="/produto/$id" params={{ id: product.id }} className="line-clamp-2 font-semibold hover:text-primary">{product.name}</Link>
+                  <p className="text-sm text-primary">{formatPrice(product.price)}</p>
+                  {typeof product.stock === "number" && (
+                    <p className="text-[11px] text-muted-foreground">Estoque: {product.stock}</p>
+                  )}
+                  <div className="mt-2 flex items-center gap-2">
+                    <button onClick={() => setQty(product.id, qty - 1)} className="grid h-8 w-8 place-items-center rounded border border-border"><Minus className="h-3 w-3" /></button>
+                    <span className="w-8 text-center text-sm font-semibold">{qty}</span>
+                    <button disabled={atMax} onClick={() => setQty(product.id, qty + 1)} className="grid h-8 w-8 place-items-center rounded border border-border disabled:opacity-40"><Plus className="h-3 w-3" /></button>
+                    {atMax && <span className="text-[10px] text-yellow-600">no limite</span>}
+                    <button onClick={() => removeFromCart(product.id)} className="ml-auto rounded p-1.5 text-destructive hover:bg-destructive/10"><Trash2 className="h-4 w-4" /></button>
+                  </div>
                 </div>
+                <div className="text-right text-sm font-bold">{formatPrice(subtotal)}</div>
               </div>
-              <div className="text-right text-sm font-bold">{formatPrice(subtotal)}</div>
-            </div>
-          ))}
+            );
+          })}
         </div>
         <aside className="h-fit rounded-lg border border-border bg-card p-5">
           <h2 className="mb-3 font-display text-lg">Resumo</h2>

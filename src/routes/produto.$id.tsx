@@ -121,27 +121,44 @@ function ProductPage() {
             <p className="font-display text-3xl text-primary md:text-4xl">{formatPrice(product.price)}</p>
           )}
           {product.stock !== undefined && (
-            <p className="text-sm text-muted-foreground">
+            <p className={`text-sm ${product.stock > 0 ? "text-muted-foreground" : "text-destructive font-semibold"}`}>
               {product.stock > 0 ? `${product.stock} em estoque` : "Esgotado"}
             </p>
           )}
           <div className="rounded-lg border border-border bg-card p-4 text-sm leading-relaxed text-muted-foreground whitespace-pre-line">
             {product.description}
           </div>
-          <div className="flex items-center gap-3">
-            <span className="text-sm font-medium">Qtd:</span>
-            <div className="flex items-center gap-2">
-              <button onClick={() => setQty(q => Math.max(1, q - 1))} className="grid h-9 w-9 place-items-center rounded border border-border"><Minus className="h-4 w-4" /></button>
-              <span className="w-10 text-center font-semibold">{qty}</span>
-              <button onClick={() => setQty(q => q + 1)} className="grid h-9 w-9 place-items-center rounded border border-border"><Plus className="h-4 w-4" /></button>
-            </div>
-          </div>
-          <button
-            onClick={() => { addToCart(product.id, qty); trackProductClick(product.id); navigate({ to: "/carrinho" }); }}
-            className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-primary py-4 text-lg font-bold text-primary-foreground shadow-lg transition hover:opacity-90"
-          >
-            <ShoppingCart className="h-5 w-5" /> Adicionar ao carrinho
-          </button>
+          {(() => {
+            const max = typeof product.stock === "number" ? product.stock : Infinity;
+            const outOfStock = typeof product.stock === "number" && product.stock <= 0;
+            return (
+              <>
+                <div className="flex items-center gap-3">
+                  <span className="text-sm font-medium">Qtd:</span>
+                  <div className="flex items-center gap-2">
+                    <button onClick={() => setQty(q => Math.max(1, q - 1))} disabled={outOfStock} className="grid h-9 w-9 place-items-center rounded border border-border disabled:opacity-40"><Minus className="h-4 w-4" /></button>
+                    <span className="w-10 text-center font-semibold">{Math.min(qty, max as number) || 0}</span>
+                    <button onClick={() => setQty(q => Math.min(max as number, q + 1))} disabled={outOfStock || qty >= (max as number)} className="grid h-9 w-9 place-items-center rounded border border-border disabled:opacity-40"><Plus className="h-4 w-4" /></button>
+                  </div>
+                  {typeof product.stock === "number" && product.stock > 0 && (
+                    <span className="text-xs text-muted-foreground">máx. {product.stock}</span>
+                  )}
+                </div>
+                <button
+                  disabled={outOfStock}
+                  onClick={() => {
+                    const r = addToCart(product.id, Math.min(qty, max as number));
+                    trackProductClick(product.id);
+                    if (r.capped) alert(`Só temos ${r.stock} em estoque. Adicionamos o máximo possível.`);
+                    if (r.added > 0) navigate({ to: "/carrinho" });
+                  }}
+                  className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-primary py-4 text-lg font-bold text-primary-foreground shadow-lg transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  <ShoppingCart className="h-5 w-5" /> {outOfStock ? "Esgotado" : "Adicionar ao carrinho"}
+                </button>
+              </>
+            );
+          })()}
           <a
             href={whatsappLink(product.name)}
             target="_blank" rel="noopener noreferrer"

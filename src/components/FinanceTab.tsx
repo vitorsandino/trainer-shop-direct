@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
-import { Plus, Trash2, Pencil, X, Download, FileSpreadsheet, DollarSign, TrendingUp, Package, Percent, Wallet, Target } from "lucide-react";
+import { Plus, Trash2, Pencil, X, Download, FileSpreadsheet, DollarSign, TrendingUp, Package, Percent, Wallet, Target, Clock, ArrowDown, ArrowUp } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, LineChart, Line, PieChart, Pie, Cell, Legend } from "recharts";
 import {
   type FinanceEntry, type FinanceStatus,
   getFinance, upsertFinance, deleteFinance, calc, exportCSV, exportXLS, downloadFile, subscribeFinance,
+  daysInStock, monthlyStats, availableMonths, formatMonth,
 } from "@/lib/finance";
 import { getProducts, getCategories, formatPrice, type CategoryDef } from "@/lib/products";
 
@@ -49,11 +50,18 @@ export function FinanceTab() {
     return { invest, revenue, gross, net, qty, avgMargin: marginCount ? marginSum / marginCount : 0, realized };
   }, [list]);
 
+  const monthOptions = useMemo(() => availableMonths(list), [list]);
+  const [month, setMonth] = useState<string>(() => new Date().toISOString().slice(0, 7));
+  useEffect(() => {
+    if (monthOptions.length && !monthOptions.includes(month)) setMonth(monthOptions[0]);
+  }, [monthOptions, month]);
+  const mStats = useMemo(() => monthlyStats(list, month), [list, month]);
+
   const handleNew = () => {
     setEditing({
       id: crypto.randomUUID(),
       name: "", category: cats[0]?.value ?? "",
-      quantity: 1, cost: 0, price: 0, feePercent: 0, shipping: 0, packaging: 0, gift: 0,
+      quantity: 1, cost: 0, price: 0, feePercent: 0, shipping: 0,
       notes: "", status: "estoque", sold: false, createdAt: Date.now(),
     });
     setOpen(true);
@@ -69,6 +77,28 @@ export function FinanceTab() {
         <Stat icon={DollarSign} label="Lucro líquido" value={formatPrice(totals.net)} color={totals.net >= 0 ? "text-emerald-500" : "text-destructive"} />
         <Stat icon={Percent} label="Margem média" value={`${totals.avgMargin.toFixed(1)}%`} color="text-primary" />
         <Stat icon={Package} label="Itens em estoque" value={totals.qty.toString()} color="text-secondary" />
+      </div>
+
+      {/* Painel mensal */}
+      <div className="rounded-lg border border-border bg-card p-4">
+        <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <h3 className="font-display text-lg">Resumo mensal</h3>
+            <p className="text-xs text-muted-foreground">Acompanhe entradas, saídas e tempo de venda mês a mês</p>
+          </div>
+          <select value={month} onChange={(e) => setMonth(e.target.value)}
+            className="rounded-md border border-border bg-input px-3 py-2 text-sm font-semibold capitalize">
+            {monthOptions.map(m => <option key={m} value={m} className="capitalize">{formatMonth(m)}</option>)}
+          </select>
+        </div>
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+          <Stat icon={ArrowUp} label="Entrou (receita)" value={formatPrice(mStats.entradasBruto)} color="text-emerald-500" />
+          <Stat icon={ArrowDown} label="Saiu (investido)" value={formatPrice(mStats.saidas)} color="text-destructive" />
+          <Stat icon={DollarSign} label="Lucro líquido do mês" value={formatPrice(mStats.entradasLiquido)} color={mStats.entradasLiquido >= 0 ? "text-emerald-500" : "text-destructive"} />
+          <Stat icon={TrendingUp} label="Saldo (lucro − invest.)" value={formatPrice(mStats.saldo)} color={mStats.saldo >= 0 ? "text-emerald-500" : "text-destructive"} />
+          <Stat icon={Package} label="Itens vendidos" value={mStats.vendidos.toString()} color="text-secondary" />
+          <Stat icon={Clock} label="Tempo médio até vender" value={mStats.tempoMedioVenda > 0 ? `${mStats.tempoMedioVenda.toFixed(1)} d` : "—"} color="text-primary" />
+        </div>
       </div>
 
       {/* Filtros */}
@@ -122,6 +152,7 @@ export function FinanceTab() {
                 <th className="p-3">Lucro un.</th>
                 <th className="p-3">Lucro total</th>
                 <th className="p-3">Margem</th>
+                <th className="p-3">Tempo</th>
                 <th className="p-3">Status</th>
                 <th className="p-3 text-right">Ações</th>
               </tr>
@@ -144,6 +175,7 @@ export function FinanceTab() {
                     <td className={`p-3 font-semibold ${c.netUnit < 0 ? "text-destructive" : "text-emerald-500"}`}>{formatPrice(c.netUnit)}</td>
                     <td className={`p-3 font-bold ${c.totalProfit < 0 ? "text-destructive" : "text-emerald-500"}`}>{formatPrice(c.totalProfit)}</td>
                     <td className="p-3"><span className={`rounded px-2 py-0.5 text-xs font-bold ${badge}`}>{c.marginPercent.toFixed(1)}%</span></td>
+                    <td className="p-3 text-xs text-muted-foreground">{daysInStock(e)}d {e.sold ? "(vendeu)" : ""}</td>
                     <td className="p-3"><StatusBadge entry={e} /></td>
                     <td className="space-x-1 p-3 text-right">
                       <button onClick={() => { setEditing(e); setOpen(true); }} className="inline-flex items-center gap-1 rounded px-2 py-1 text-xs text-secondary hover:bg-secondary/10">
@@ -157,7 +189,7 @@ export function FinanceTab() {
                 );
               })}
               {filtered.length === 0 && (
-                <tr><td colSpan={12} className="p-10 text-center text-muted-foreground">Nenhum registro financeiro</td></tr>
+                <tr><td colSpan={13} className="p-10 text-center text-muted-foreground">Nenhum registro financeiro</td></tr>
               )}
             </tbody>
           </table>
@@ -336,10 +368,6 @@ function FinanceForm({ entry, cats, onClose, onSave }: { entry: FinanceEntry; ca
                 <option value="reservado">Reservado</option>
               </select>
             </F>
-          </div>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <F label="Custo de embalagem un. (R$)"><input type="number" step="0.01" value={data.packaging ?? 0} onChange={(e) => set("packaging", +e.target.value || 0)} className="finput" /></F>
-            <F label="Custo de brinde un. (R$)"><input type="number" step="0.01" value={data.gift ?? 0} onChange={(e) => set("gift", +e.target.value || 0)} className="finput" /></F>
           </div>
           <F label="Observações"><textarea rows={2} value={data.notes ?? ""} onChange={(e) => set("notes", e.target.value)} className="finput" /></F>
           <label className="flex items-center gap-2 rounded-lg border border-border bg-background/40 p-3">
