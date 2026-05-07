@@ -58,23 +58,25 @@ fi
 
 echo "==> Escrevendo novo Nginx site para ${DOMAIN}"
 rm -f /etc/nginx/sites-enabled/default
+APP_DIR="/var/www/${APP_NAME}"
 cat > /etc/nginx/sites-available/${APP_NAME} <<NGINX
 server {
     listen 80;
     listen [::]:80;
     server_name ${DOMAIN} www.${DOMAIN};
+    root ${APP_DIR}/dist/client;
+    index index.html;
 
     client_max_body_size 25m;
 
+    location /assets/ {
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+        try_files \$uri =404;
+    }
+
     location / {
-        proxy_pass http://127.0.0.1:${PORT};
-        proxy_http_version 1.1;
-        proxy_set_header Host \$host;
-        proxy_set_header X-Real-IP \$remote_addr;
-        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto \$scheme;
-        proxy_set_header Upgrade \$http_upgrade;
-        proxy_set_header Connection "upgrade";
+        try_files \$uri \$uri/ /index.html;
     }
 }
 NGINX
