@@ -87,7 +87,7 @@ const DEFAULT_COLLECTIONS: CollectionDef[] = [
 export function getCollections(): CollectionDef[] {
   if (typeof window === "undefined") return DEFAULT_COLLECTIONS;
   const raw = localStorage.getItem(COLL_KEY);
-  if (!raw) { localStorage.setItem(COLL_KEY, JSON.stringify(DEFAULT_COLLECTIONS)); return DEFAULT_COLLECTIONS; }
+  if (!raw) return DEFAULT_COLLECTIONS; // não semeia
   try { return JSON.parse(raw); } catch { return DEFAULT_COLLECTIONS; }
 }
 const collListeners = new Set<() => void>();
