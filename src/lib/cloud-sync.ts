@@ -112,7 +112,9 @@ export function getSyncStatus() { return currentStatus; }
 export function subscribeSyncStatus(cb: (s: SyncStatus) => void) {
   statusListeners.add(cb);
   cb(currentStatus);
-  return () => statusListeners.delete(cb);
+  return () => {
+    statusListeners.delete(cb);
+  };
 }
 
 /** Baixa todas as chaves `pkmn_*` do Supabase e grava no localStorage. */
@@ -140,7 +142,7 @@ export async function pullFromCloud(options?: { background?: boolean }): Promise
     }
     setStatus("idle");
     changedKeys.forEach((key) => emitKeyChange(key));
-    window.dispatchEvent(new Event("cloud-sync-pulled"));
+    if (changedKeys.size > 0) window.dispatchEvent(new Event("cloud-sync-pulled"));
     return { ok: true, count };
   } finally {
     pulling = false;
