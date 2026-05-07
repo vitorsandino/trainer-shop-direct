@@ -1,6 +1,7 @@
 import { createFileRoute, Link, useNavigate, useSearch } from "@tanstack/react-router";
 import { useState } from "react";
 import { login, register } from "@/lib/auth";
+import { migrateOrdersToUser } from "@/lib/orders";
 
 type Search = { redirect?: string };
 
@@ -24,8 +25,10 @@ function LoginPage() {
     e.preventDefault();
     setErr(""); setBusy(true);
     try {
-      if (mode === "login") await login(email, password);
-      else await register({ name, email, phone, password });
+      const user = mode === "login"
+        ? await login(email, password)
+        : await register({ name, email, phone, password });
+      if (user) migrateOrdersToUser(user.id, user.email);
       navigate({ to: search.redirect ?? "/conta" });
     } catch (e: any) { setErr(e?.message ?? "Erro"); }
     finally { setBusy(false); }
