@@ -10,6 +10,8 @@ export type FinanceEntry = {
   price: number;       // preço de venda
   feePercent: number;  // taxa marketplace %
   shipping: number;    // frete por unidade
+  packaging?: number;  // custo de embalagem por unidade
+  gift?: number;       // custo de brinde por unidade
   notes?: string;
   status: FinanceStatus;
   sold: boolean;       // já vendido (lucro realizado)
@@ -46,12 +48,14 @@ export type FinanceCalc = {
   totalProfit: number;
 };
 
-export function calc(e: Pick<FinanceEntry, "cost" | "price" | "feePercent" | "shipping" | "quantity">): FinanceCalc {
+export function calc(e: Pick<FinanceEntry, "cost" | "price" | "feePercent" | "shipping" | "quantity"> & { packaging?: number; gift?: number }): FinanceCalc {
   const fee = (e.price * (e.feePercent || 0)) / 100;
+  const extras = (e.shipping || 0) + (e.packaging || 0) + (e.gift || 0);
+  const totalCostUnit = e.cost + extras;
   const grossUnit = e.price - e.cost;
-  const netUnit = e.price - e.cost - fee - (e.shipping || 0);
-  const marginPercent = e.cost > 0 ? (netUnit / e.cost) * 100 : 0;
-  const invest = e.cost * e.quantity;
+  const netUnit = e.price - e.cost - fee - extras;
+  const marginPercent = totalCostUnit > 0 ? (netUnit / totalCostUnit) * 100 : 0;
+  const invest = totalCostUnit * e.quantity;
   const revenue = e.price * e.quantity;
   const totalProfit = netUnit * e.quantity;
   return { grossUnit, netUnit, marginPercent, invest, revenue, totalProfit };
