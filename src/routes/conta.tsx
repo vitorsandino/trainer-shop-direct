@@ -12,6 +12,7 @@ function AccountLayout() {
   const user = useAuth();
   const navigate = useNavigate();
   useEffect(() => { if (user === null) navigate({ to: "/login", search: { redirect: "/conta" } }); }, [user, navigate]);
+  if (user === undefined) return <div className="container mx-auto px-4 py-16 text-center text-sm text-muted-foreground">Carregando conta...</div>;
   if (!user) return null;
 
   return (
