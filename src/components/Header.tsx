@@ -44,20 +44,43 @@ export function Header() {
           </Link>
 
           <nav className="ml-6 hidden items-center gap-1 lg:flex">
-            <Link to="/" className="rounded-md px-3 py-2 text-sm font-semibold text-primary data-[inactive]:text-foreground/70" data-inactive={path !== "/" ? "" : undefined}>
+            <Link to="/" className="rounded-md px-3 py-2 text-sm font-bold text-secondary" activeOptions={{ exact: true }} activeProps={{ className: "rounded-md px-3 py-2 text-sm font-bold text-secondary" }} inactiveProps={{ className: "rounded-md px-3 py-2 text-sm font-medium text-foreground/80 hover:text-primary" }}>
               Início
             </Link>
-            {CATEGORIES.slice(0, 5).map(c => (
-              <Link
-                key={c.value}
-                to="/categoria/$slug"
-                params={{ slug: c.value }}
-                className="rounded-md px-3 py-2 text-sm font-medium text-foreground/70 transition hover:text-primary data-[active]:text-primary"
-                data-active={path === `/categoria/${c.value}` ? "" : undefined}
-              >
-                {c.label}
-              </Link>
-            ))}
+
+            <div className="group relative">
+              <button className="flex items-center gap-1 rounded-md px-3 py-2 text-sm font-medium text-foreground/80 hover:text-primary">
+                Sobre <ChevronDown className="h-3.5 w-3.5" />
+              </button>
+              <div className="invisible absolute left-0 top-full z-50 min-w-[180px] rounded-md border border-border bg-card py-2 opacity-0 shadow-lg transition group-hover:visible group-hover:opacity-100">
+                <a href="#sobre" className="block px-4 py-2 text-sm hover:bg-muted">A loja</a>
+                <a href={`https://wa.me/${WHATSAPP_NUMBER}`} target="_blank" rel="noopener noreferrer" className="block px-4 py-2 text-sm hover:bg-muted">Atendimento</a>
+              </div>
+            </div>
+
+            <Link to="/categoria/$slug" params={{ slug: "booster" }} className="rounded-md px-3 py-2 text-sm font-medium text-foreground/80 hover:text-primary">
+              Boosters
+            </Link>
+            <Link to="/categoria/$slug" params={{ slug: "avulsas" }} className="rounded-md px-3 py-2 text-sm font-medium text-foreground/80 hover:text-primary">
+              Cartas
+            </Link>
+
+            <div className="group relative">
+              <button className="flex items-center gap-1 rounded-md px-3 py-2 text-sm font-medium text-foreground/80 hover:text-primary">
+                Produtos <ChevronDown className="h-3.5 w-3.5" />
+              </button>
+              <div className="invisible absolute left-0 top-full z-50 min-w-[200px] rounded-md border border-border bg-card py-2 opacity-0 shadow-lg transition group-hover:visible group-hover:opacity-100">
+                {getCategories().map(c => (
+                  <Link key={c.value} to="/categoria/$slug" params={{ slug: c.value }} className="block px-4 py-2 text-sm hover:bg-muted">
+                    {c.label}
+                  </Link>
+                ))}
+              </div>
+            </div>
+
+            <a href={`https://wa.me/${WHATSAPP_NUMBER}`} target="_blank" rel="noopener noreferrer" className="rounded-md px-3 py-2 text-sm font-medium text-foreground/80 hover:text-primary">
+              Contato
+            </a>
           </nav>
 
           <form onSubmit={submit} className="ml-auto hidden flex-1 max-w-sm md:block">
