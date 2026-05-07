@@ -73,7 +73,12 @@ export type FinanceCalc = {
   totalProfit: number;
 };
 
-export function calc(e: Pick<FinanceEntry, "cost" | "price" | "feePercent" | "shipping" | "quantity">): FinanceCalc {
+export function calc(e: Pick<FinanceEntry, "cost" | "price" | "feePercent" | "shipping" | "quantity"> & { expenseOnly?: boolean }): FinanceCalc {
+  if (e.expenseOnly) {
+    const unitOut = (e.cost || 0) + (e.shipping || 0);
+    const invest = unitOut * e.quantity;
+    return { grossUnit: -unitOut, netUnit: -unitOut, marginPercent: 0, invest, revenue: 0, totalProfit: -invest };
+  }
   const fee = (e.price * (e.feePercent || 0)) / 100;
   const extras = (e.shipping || 0);
   const totalCostUnit = e.cost + extras;
