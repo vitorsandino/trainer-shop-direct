@@ -7,19 +7,20 @@ import {
   getAnalytics, resetAnalytics,
 } from "@/lib/products";
 import {
-  Trash2, Plus, X, Package, Tag, BarChart3, LogOut,
+  Trash2, Plus, X, Package, Tag, BarChart3, LogOut, Wallet,
   Image as ImageIcon, Eye, MousePointerClick, TrendingUp, Pencil,
 } from "lucide-react";
+import { FinanceTab } from "@/components/FinanceTab";
 
 const ADMIN_USER = "admin";
-const ADMIN_PASSWORD = "admin";
+const ADMIN_PASSWORD = "s3n4@123";
 const AUTH_KEY = "pkmn_admin_auth";
 
 export const Route = createFileRoute("/admin")({
   component: AdminPage,
 });
 
-type Tab = "products" | "categories" | "analytics";
+type Tab = "products" | "categories" | "analytics" | "finance";
 
 function AdminPage() {
   const [authed, setAuthed] = useState(false);
