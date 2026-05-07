@@ -119,7 +119,16 @@ export const sendOrderStatusUpdate = createServerFn({ method: "POST" })
 
 // ---------- Password reset ----------
 function admin() {
-  return createClient(process.env.MY_SUPABASE_URL!, process.env.MY_SUPABASE_SERVICE_ROLE_KEY!, {
+  const url =
+    process.env.MY_SUPABASE_URL ||
+    process.env.SUPABASE_URL ||
+    process.env.VITE_SUPABASE_URL;
+  const key =
+    process.env.MY_SUPABASE_SERVICE_ROLE_KEY ||
+    process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!url) throw new Error("Supabase URL ausente no servidor (defina SUPABASE_URL ou MY_SUPABASE_URL)");
+  if (!key) throw new Error("SUPABASE_SERVICE_ROLE_KEY ausente no servidor");
+  return createClient(url, key, {
     auth: { autoRefreshToken: false, persistSession: false },
   });
 }
