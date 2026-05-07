@@ -104,7 +104,7 @@ cat > /etc/nginx/sites-available/${APP_NAME} <<NGINX
 server {
     listen 80 default_server;
     listen [::]:80 default_server;
-    server_name ${DOMAIN} www.${DOMAIN};
+    server_name ${DOMAIN};
 
     client_max_body_size 25m;
 
@@ -133,10 +133,10 @@ fi
 
 echo "==> [8/8] Emitindo SSL para ${DOMAIN} e www.${DOMAIN}"
 certbot --nginx \
-  -d "${DOMAIN}" -d "www.${DOMAIN}" \
+  -d "${DOMAIN}" \
   --non-interactive --agree-tos -m "${EMAIL}" --redirect \
   || echo "AVISO: certbot falhou. Confirme DNS e rode:
-  certbot --nginx -d ${DOMAIN} -d www.${DOMAIN} --agree-tos -m ${EMAIL} --redirect"
+  certbot --nginx -d ${DOMAIN} --agree-tos -m ${EMAIL} --redirect"
 
 echo ""
 echo "==================================================="
