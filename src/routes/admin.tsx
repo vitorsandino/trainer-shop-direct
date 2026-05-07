@@ -4,7 +4,7 @@ import {
   type Category, type Product, type CategoryDef,
   getProducts, upsertProduct, deleteProduct, formatPrice,
   getCategories, saveCategories, slugify, subscribeCategories,
-  getAnalytics, resetAnalytics,
+  getAnalytics, resetAnalytics, productCategories, discountPercent,
 } from "@/lib/products";
 import {
   Trash2, Plus, X, Package, Tag, BarChart3, LogOut, Wallet,
@@ -127,7 +127,8 @@ function ProductsTab() {
   const handleNew = () => {
     setEditing({
       id: crypto.randomUUID(),
-      name: "", category: cats[0]?.value ?? "booster", price: 0, description: "",
+      name: "", category: cats[0]?.value ?? "booster", categories: cats[0] ? [cats[0].value] : [],
+      price: 0, originalPrice: undefined, description: "",
       images: [], stock: 0, featured: false, banner: false, bannerSubtitle: "", bannerBadge: "", createdAt: Date.now(),
     });
     setOpen(true);
@@ -177,8 +178,21 @@ function ProductsTab() {
                       </div>
                     </div>
                   </td>
-                  <td className="p-3 text-muted-foreground">{cats.find(c => c.value === p.category)?.label ?? p.category}</td>
-                  <td className="p-3 font-semibold">{formatPrice(p.price)}</td>
+                  <td className="p-3 text-muted-foreground">
+                    <div className="flex flex-wrap gap-1">
+                      {productCategories(p).map(v => (
+                        <span key={v} className="rounded bg-background px-1.5 py-0.5 text-[10px]">{cats.find(c => c.value === v)?.label ?? v}</span>
+                      ))}
+                    </div>
+                  </td>
+                  <td className="p-3 font-semibold">
+                    {p.originalPrice && p.originalPrice > p.price ? (
+                      <div className="leading-tight">
+                        <div className="text-[10px] text-muted-foreground line-through">{formatPrice(p.originalPrice)}</div>
+                        <div className="text-primary">{formatPrice(p.price)} <span className="text-[10px] font-bold text-destructive">-{discountPercent(p)}%</span></div>
+                      </div>
+                    ) : formatPrice(p.price)}
+                  </td>
                   <td className="p-3">{p.stock ?? "-"}</td>
                   <td className="space-x-1 p-3 text-right">
                     <button onClick={() => { setEditing(p); setOpen(true); }} className="inline-flex items-center gap-1 rounded px-2 py-1 text-xs text-secondary hover:bg-secondary/10">
