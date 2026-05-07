@@ -70,8 +70,8 @@ cd "${APP_DIR}"
 git fetch --all
 git reset --hard origin/HEAD
 bun install
-# instala miniflare 4 fora do package.json (runtime de produção)
-npm install --no-save --prefix "${APP_DIR}" miniflare@^4
+# instala runtimes do servidor fora do package.json (produção)
+npm install --no-save --prefix "${APP_DIR}" miniflare@^4 wrangler@^4
 bun run build
 
 if [ ! -f "${APP_DIR}/dist/server/index.js" ]; then
@@ -131,7 +131,7 @@ if command -v ufw >/dev/null 2>&1; then
   ufw allow 'Nginx Full' 2>/dev/null || true
 fi
 
-echo "==> [8/8] Emitindo SSL para ${DOMAIN} e www.${DOMAIN}"
+echo "==> [8/8] Emitindo SSL para ${DOMAIN}"
 certbot --nginx \
   -d "${DOMAIN}" \
   --non-interactive --agree-tos -m "${EMAIL}" --redirect \
