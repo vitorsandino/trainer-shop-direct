@@ -184,12 +184,7 @@ export async function register(input: { name: string; email: string; phone?: str
   persistSession(currentUser);
   emit();
 
-  try {
-    const { sendWelcomeEmail } = await import("@/lib/email.functions");
-    await sendWelcomeEmail({ data: { email, name } });
-  } catch (error) {
-    console.warn("[email] welcome falhou:", error);
-  }
+  // Welcome email é enviado pela camada de UI (login.tsx) para surfacing de erros.
 
   return currentUser;
 }
