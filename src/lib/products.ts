@@ -17,10 +17,7 @@ const ANALYTICS_KEY = "pkmn_analytics_v1";
 export function getCategories(): CategoryDef[] {
   if (typeof window === "undefined") return DEFAULT_CATEGORIES;
   const raw = localStorage.getItem(CAT_KEY);
-  if (!raw) {
-    localStorage.setItem(CAT_KEY, JSON.stringify(DEFAULT_CATEGORIES));
-    return DEFAULT_CATEGORIES;
-  }
+  if (!raw) return DEFAULT_CATEGORIES; // não semeia — evita sobrescrever a nuvem
   try { return JSON.parse(raw); } catch { return DEFAULT_CATEGORIES; }
 }
 
