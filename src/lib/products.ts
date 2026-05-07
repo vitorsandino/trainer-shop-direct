@@ -17,10 +17,7 @@ const ANALYTICS_KEY = "pkmn_analytics_v1";
 export function getCategories(): CategoryDef[] {
   if (typeof window === "undefined") return DEFAULT_CATEGORIES;
   const raw = localStorage.getItem(CAT_KEY);
-  if (!raw) {
-    localStorage.setItem(CAT_KEY, JSON.stringify(DEFAULT_CATEGORIES));
-    return DEFAULT_CATEGORIES;
-  }
+  if (!raw) return DEFAULT_CATEGORIES; // não semeia — evita sobrescrever a nuvem
   try { return JSON.parse(raw); } catch { return DEFAULT_CATEGORIES; }
 }
 
@@ -90,7 +87,7 @@ const DEFAULT_COLLECTIONS: CollectionDef[] = [
 export function getCollections(): CollectionDef[] {
   if (typeof window === "undefined") return DEFAULT_COLLECTIONS;
   const raw = localStorage.getItem(COLL_KEY);
-  if (!raw) { localStorage.setItem(COLL_KEY, JSON.stringify(DEFAULT_COLLECTIONS)); return DEFAULT_COLLECTIONS; }
+  if (!raw) return DEFAULT_COLLECTIONS; // não semeia
   try { return JSON.parse(raw); } catch { return DEFAULT_COLLECTIONS; }
 }
 const collListeners = new Set<() => void>();
@@ -132,10 +129,7 @@ const seed: Product[] = [];
 export function getProducts(): Product[] {
   if (typeof window === "undefined") return seed;
   const raw = localStorage.getItem(KEY);
-  if (!raw) {
-    localStorage.setItem(KEY, JSON.stringify(seed));
-    return seed;
-  }
+  if (!raw) return seed; // NÃO semeia no localStorage — evita cloud-sync apagar produtos da nuvem
   try { return JSON.parse(raw); } catch { return seed; }
 }
 
