@@ -19,6 +19,10 @@ export type FinanceEntry = {
   sold: boolean;       // já vendido (lucro realizado)
   soldAt?: number;     // quando foi vendido (timestamp)
   createdAt: number;
+  /** Registro de pura saída (frete, embalagem, brinde). Não tem venda/lucro. */
+  expenseOnly?: boolean;
+  /** Tipo de saída quando expenseOnly=true (ex: frete, embalagem, brinde, outro) */
+  expenseKind?: string;
 };
 
 const KEY = "pkmn_finance_v1";
