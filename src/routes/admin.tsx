@@ -69,6 +69,7 @@ function AdminDashboard({ onLogout }: { onLogout: () => void }) {
     { id: "products", label: "Produtos", icon: Package },
     { id: "categories", label: "Categorias", icon: Tag },
     { id: "analytics", label: "Acessos", icon: BarChart3 },
+    { id: "finance", label: "Financeiro", icon: Wallet },
   ];
 
   return (
