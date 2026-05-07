@@ -38,7 +38,12 @@ export function saveFinance(list: FinanceEntry[]) {
   localStorage.setItem(KEY, JSON.stringify(list));
   listeners.forEach((cb) => cb());
 }
-export function subscribeFinance(cb: () => void) { listeners.add(cb); return () => listeners.delete(cb); }
+export function subscribeFinance(cb: () => void) {
+  listeners.add(cb);
+  return () => {
+    listeners.delete(cb);
+  };
+}
 export function upsertFinance(e: FinanceEntry) {
   const list = getFinance();
   const i = list.findIndex(x => x.id === e.id);
