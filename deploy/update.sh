@@ -8,7 +8,7 @@ cd "${APP_DIR}"
 git pull --ff-only
 bun install
 bun run build
-# garante miniflare presente (não está no package.json)
-[ -d "${APP_DIR}/node_modules/miniflare" ] || npm install --no-save --prefix "${APP_DIR}" miniflare@3
+# força a versão compatível do runtime usada pelo servidor
+npm install --no-save --prefix "${APP_DIR}" miniflare@^4
 pm2 restart "${APP_NAME}" --update-env
 echo "Atualizado com sucesso."

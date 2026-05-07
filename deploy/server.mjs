@@ -58,6 +58,10 @@ function tryServeStatic(pathname) {
 const mf = new Miniflare({
   modules: true,
   scriptPath,
+  modulesRoot: root,
+  modulesRules: [
+    { type: "ESModule", include: ["**/*.js", "**/*.mjs"], fallthrough: true },
+  ],
   compatibilityDate: "2025-09-24",
   compatibilityFlags: ["nodejs_compat"],
 });
