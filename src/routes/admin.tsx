@@ -7,19 +7,20 @@ import {
   getAnalytics, resetAnalytics,
 } from "@/lib/products";
 import {
-  Trash2, Plus, X, Package, Tag, BarChart3, LogOut,
+  Trash2, Plus, X, Package, Tag, BarChart3, LogOut, Wallet,
   Image as ImageIcon, Eye, MousePointerClick, TrendingUp, Pencil,
 } from "lucide-react";
+import { FinanceTab } from "@/components/FinanceTab";
 
 const ADMIN_USER = "admin";
-const ADMIN_PASSWORD = "admin";
+const ADMIN_PASSWORD = "s3n4@123";
 const AUTH_KEY = "pkmn_admin_auth";
 
 export const Route = createFileRoute("/admin")({
   component: AdminPage,
 });
 
-type Tab = "products" | "categories" | "analytics";
+type Tab = "products" | "categories" | "analytics" | "finance";
 
 function AdminPage() {
   const [authed, setAuthed] = useState(false);
@@ -68,6 +69,7 @@ function AdminDashboard({ onLogout }: { onLogout: () => void }) {
     { id: "products", label: "Produtos", icon: Package },
     { id: "categories", label: "Categorias", icon: Tag },
     { id: "analytics", label: "Acessos", icon: BarChart3 },
+    { id: "finance", label: "Financeiro", icon: Wallet },
   ];
 
   return (
@@ -102,6 +104,7 @@ function AdminDashboard({ onLogout }: { onLogout: () => void }) {
           {tab === "products" && <ProductsTab />}
           {tab === "categories" && <CategoriesTab />}
           {tab === "analytics" && <AnalyticsTab />}
+          {tab === "finance" && <FinanceTab />}
         </div>
       </div>
     </div>
