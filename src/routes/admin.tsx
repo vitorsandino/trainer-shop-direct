@@ -482,6 +482,45 @@ function ProductForm({ product, categories, onClose, onSave }: { product: Produc
               <input required type="number" step="0.01" value={data.price} onChange={(e) => setData({ ...data, price: parseFloat(e.target.value) || 0 })} className="input" />
             </Field>
           </div>
+          <Field label="Categorias (selecione uma ou mais)">
+            <div className="flex flex-wrap gap-2 rounded-md border border-border bg-input p-2">
+              {categories.map(c => {
+                const selected = (data.categories ?? [data.category]).includes(c.value);
+                return (
+                  <button
+                    type="button"
+                    key={c.value}
+                    onClick={() => {
+                      const cur = data.categories ?? (data.category ? [data.category] : []);
+                      const next = cur.includes(c.value) ? cur.filter(x => x !== c.value) : [...cur, c.value];
+                      setData({ ...data, categories: next, category: (next[0] ?? c.value) as Category });
+                    }}
+                    className={`rounded-full border px-3 py-1 text-xs transition ${selected ? "border-primary bg-primary/15 text-primary" : "border-border hover:border-secondary"}`}
+                  >
+                    {c.label}
+                  </button>
+                );
+              })}
+            </div>
+          </Field>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <Field label="Preço (R$)">
+              <input required type="number" step="0.01" value={data.price} onChange={(e) => setData({ ...data, price: parseFloat(e.target.value) || 0 })} className="input" />
+            </Field>
+            <Field label='Preço "DE" — antes do desconto (opcional)'>
+              <input type="number" step="0.01" value={data.originalPrice ?? ""} onChange={(e) => setData({ ...data, originalPrice: e.target.value ? parseFloat(e.target.value) : undefined })} className="input" placeholder="Ex: 400,00" />
+            </Field>
+          </div>
+          {data.originalPrice && data.originalPrice > data.price && (
+            <div className="rounded-md border border-primary/30 bg-primary/5 px-3 py-2 text-sm">
+              <span className="text-muted-foreground">Promoção: </span>
+              <span className="line-through">{formatPrice(data.originalPrice)}</span>{" "}
+              → <span className="font-bold text-primary">{formatPrice(data.price)}</span>{" "}
+              <span className="ml-1 rounded bg-destructive px-1.5 py-0.5 text-[10px] font-bold text-destructive-foreground">
+                -{discountPercent(data)}%
+              </span>
+            </div>
+          )}
           <Field label="Descrição">
             <textarea required rows={4} value={data.description} onChange={(e) => setData({ ...data, description: e.target.value })} className="input" />
           </Field>
