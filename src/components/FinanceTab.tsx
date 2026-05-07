@@ -79,6 +79,28 @@ export function FinanceTab() {
         <Stat icon={Package} label="Itens em estoque" value={totals.qty.toString()} color="text-secondary" />
       </div>
 
+      {/* Painel mensal */}
+      <div className="rounded-lg border border-border bg-card p-4">
+        <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <h3 className="font-display text-lg">Resumo mensal</h3>
+            <p className="text-xs text-muted-foreground">Acompanhe entradas, saídas e tempo de venda mês a mês</p>
+          </div>
+          <select value={month} onChange={(e) => setMonth(e.target.value)}
+            className="rounded-md border border-border bg-input px-3 py-2 text-sm font-semibold capitalize">
+            {monthOptions.map(m => <option key={m} value={m} className="capitalize">{formatMonth(m)}</option>)}
+          </select>
+        </div>
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+          <Stat icon={ArrowUp} label="Entrou (receita)" value={formatPrice(mStats.entradasBruto)} color="text-emerald-500" />
+          <Stat icon={ArrowDown} label="Saiu (investido)" value={formatPrice(mStats.saidas)} color="text-destructive" />
+          <Stat icon={DollarSign} label="Lucro líquido do mês" value={formatPrice(mStats.entradasLiquido)} color={mStats.entradasLiquido >= 0 ? "text-emerald-500" : "text-destructive"} />
+          <Stat icon={TrendingUp} label="Saldo (lucro − invest.)" value={formatPrice(mStats.saldo)} color={mStats.saldo >= 0 ? "text-emerald-500" : "text-destructive"} />
+          <Stat icon={Package} label="Itens vendidos" value={mStats.vendidos.toString()} color="text-secondary" />
+          <Stat icon={Clock} label="Tempo médio até vender" value={mStats.tempoMedioVenda > 0 ? `${mStats.tempoMedioVenda.toFixed(1)} d` : "—"} color="text-primary" />
+        </div>
+      </div>
+
       {/* Filtros */}
       <div className="flex flex-wrap items-center gap-2 rounded-lg border border-border bg-card p-3">
         <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Buscar produto..."
