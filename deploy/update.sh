@@ -8,7 +8,7 @@ cd "${APP_DIR}"
 git pull --ff-only
 bun install
 bun run build
-# força a versão compatível do runtime usada pelo servidor
-npm install --no-save --prefix "${APP_DIR}" miniflare@^4
-pm2 restart "${APP_NAME}" --update-env
+pm2 delete "${APP_NAME}" >/dev/null 2>&1 || true
+nginx -t
+systemctl reload nginx
 echo "Atualizado com sucesso."
