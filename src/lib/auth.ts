@@ -190,39 +190,20 @@ export async function register(input: { name: string; email: string; phone?: str
 
   if (!email || !input.password || !name) throw new Error("Preencha todos os campos");
 
+  // Cria o usuário no servidor (já confirmado, sem e-mail do Supabase) e envia welcome via SMTP
+  const { registerUserServer } = await import("@/lib/email.functions");
+  await registerUserServer({ data: { email, password: input.password, name, phone } });
+
   const supabase = await getSupabase();
   if (!supabase) throw new Error("Supabase não configurado");
 
-  const { data, error } = await supabase.auth.signUp({
-    email,
-    password: input.password,
-    options: {
-      data: {
-        name,
-        phone: phone ?? "",
-      },
-    },
-  });
-
-  if (error) throw new Error(authErrorMessage(error.message));
-
-  if (!data.session) {
-    const loginResult = await supabase.auth.signInWithPassword({ email, password: input.password });
-    if (loginResult.error) {
-      throw new Error("Conta criada, mas é preciso confirmar o e-mail antes de entrar");
-    }
-    currentUser = normalizeUser(loginResult.data.user);
-  } else {
-    currentUser = normalizeUser(data.user);
-  }
+  const loginResult = await supabase.auth.signInWithPassword({ email, password: input.password });
+  if (loginResult.error) throw new Error(authErrorMessage(loginResult.error.message));
+  currentUser = normalizeUser(loginResult.data.user);
 
   hydrated = true;
   removeLegacyUser(email);
   emit();
-  // dispara boas-vindas (não bloqueia o fluxo)
-  void import("@/lib/email.functions").then(m =>
-    m.sendWelcomeEmail({ data: { email, name } }).catch(err => console.warn("[email] welcome:", err))
-  );
   return currentUser;
 }
 
