@@ -52,22 +52,27 @@ bun install
 echo "==> Build"
 bun run build
 
-# Detecta entry do TanStack Start
-ENTRY=""
-for cand in ".output/server/index.mjs" ".output/server/server.mjs" "dist/server/index.mjs"; do
-  [ -f "${APP_DIR}/${cand}" ] && ENTRY="${APP_DIR}/${cand}" && break
-done
-if [ -z "${ENTRY}" ]; then
-  echo "ERRO: build não gerou entry server. Conteúdo de .output/server:"
-  ls -la "${APP_DIR}/.output/server" 2>/dev/null || true
+echo "==> Build (Cloudflare Worker output em dist/)"
+bun run build
+
+if [ ! -d "${APP_DIR}/dist/server/assets" ] || [ ! -d "${APP_DIR}/dist/client" ]; then
+  echo "ERRO: build não gerou dist/server/assets ou dist/client"
+  ls -la "${APP_DIR}/dist" 2>/dev/null || true
   exit 1
 fi
-echo "==> Entry detectado: ${ENTRY}"
+
+echo "==> Instalando Miniflare (runtime workerd em Node) p/ servir o worker"
+# instala localmente no projeto sem mexer no package.json
+npm install --no-save --prefix "${APP_DIR}" miniflare@3
+
+ENTRY="${APP_DIR}/deploy/server.mjs"
+echo "==> Entry: ${ENTRY}"
 
 echo "==> Subindo com PM2"
 pm2 delete "${APP_NAME}" >/dev/null 2>&1 || true
+cd "${APP_DIR}"
 PORT="${PORT}" HOST="127.0.0.1" pm2 start "${ENTRY}" --name "${APP_NAME}" \
-  --update-env --time
+  --interpreter node --update-env --time
 pm2 save
 pm2 startup systemd -u root --hp /root | tail -n 1 | bash || true
 
