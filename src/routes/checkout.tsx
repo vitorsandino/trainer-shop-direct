@@ -133,8 +133,8 @@ function CheckoutPage() {
       if (finChanged) saveFinance(nextFin);
 
       // dispara e-mail de confirmação (não bloqueia)
-      void import("@/lib/email.functions").then(m =>
-        m.sendOrderConfirmation({ data: {
+      void import("@/lib/email-client").then(m =>
+        m.sendOrderConfirmation({
           email: user.email,
           code: order.code,
           userName: user.name,
@@ -144,7 +144,7 @@ function CheckoutPage() {
             fullName: addr.fullName, street: addr.street, number: addr.number, complement: addr.complement,
             district: addr.district, city: addr.city, state: addr.state, zip: addr.zip,
           },
-        }}).catch(err => console.warn("[email] confirm:", err))
+        }).catch(err => console.warn("[email] confirm:", err))
       );
 
       clearCart();
