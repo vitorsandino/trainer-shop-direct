@@ -35,8 +35,9 @@
   --color-neon: var(--neon);
   --color-electric: var(--electric);
   --color-pokered: var(--pokered);
-  --font-display: "Fredoka", "Baloo 2", system-ui, sans-serif;
-  --font-sans: "Space Grotesk", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --color-highlight: var(--highlight);
+  --font-display: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
 }
 
 :root {
@@ -76,6 +77,7 @@
   --neon: oklch(0.88 0.22 145);            /* verde neon */
   --electric: oklch(0.7 0.2 250);          /* azul elétrico */
   --pokered: oklch(0.62 0.24 25);          /* vermelho pokédex */
+  --highlight: #BE2C5D;                    /* rosa/magenta destaque de texto */
 
   --whatsapp: oklch(0.7 0.18 150);
   --whatsapp-foreground: oklch(1 0 0);
