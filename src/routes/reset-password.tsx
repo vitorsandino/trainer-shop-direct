@@ -36,7 +36,7 @@ function ResetPage() {
     }
     setBusy(true);
     try {
-      const result = await resetPassword({ data: { token } });
+      const result = await verifyPasswordResetToken({ token });
       await resetPasswordByEmail(result.email, pw);
       setDone(true);
       setTimeout(() => navigate({ to: "/login" }), 2000);
