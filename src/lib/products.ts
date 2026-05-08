@@ -153,7 +153,7 @@ export function getProduct(id: string) {
   return getProducts().find(p => p.id === id);
 }
 
-export const WHATSAPP_NUMBER = "5519987601686";
+export const WHATSAPP_NUMBER = "5519996108105";
 export function whatsappLink(productName: string) {
   const msg = encodeURIComponent(`Olá! Tenho interesse no produto: ${productName}`);
   return `https://wa.me/${WHATSAPP_NUMBER}?text=${msg}`;
