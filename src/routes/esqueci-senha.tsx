@@ -16,7 +16,7 @@ function ForgotPage() {
     e.preventDefault();
     setErr(""); setBusy(true);
     try {
-      await requestPasswordReset({ data: { email: email.trim().toLowerCase(), origin: window.location.origin } });
+      await requestPasswordReset({ email: email.trim().toLowerCase(), origin: window.location.origin });
       setDone(true);
     } catch (e: any) { setErr(e?.message ?? "Erro"); }
     finally { setBusy(false); }
