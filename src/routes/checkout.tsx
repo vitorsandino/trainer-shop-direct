@@ -210,10 +210,10 @@ function CheckoutPage() {
           <div className="flex justify-between border-t border-border pt-3 font-display text-xl">
             <span>Total</span><span className="text-primary">{formatPrice(data.total)}</span>
           </div>
-          <button disabled={busy} className="w-full rounded-md bg-primary py-3 font-bold text-primary-foreground hover:opacity-90 disabled:opacity-60">
-            {busy ? "Processando..." : "Confirmar pedido"}
+          <button disabled={busy} className="w-full rounded-md bg-[var(--whatsapp)] py-3 font-bold text-[var(--whatsapp-foreground)] hover:brightness-110 disabled:opacity-60">
+            {busy ? "Processando..." : "Enviar pedido pelo WhatsApp"}
           </button>
-          <p className="text-center text-xs text-muted-foreground">Você será redirecionado para o WhatsApp para combinar pagamento.</p>
+          <p className="text-center text-xs text-muted-foreground">Seu pedido será registrado na sua conta e enviado para nosso WhatsApp para combinar o pagamento.</p>
         </aside>
       </form>
     </div>
