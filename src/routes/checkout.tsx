@@ -148,10 +148,21 @@ function CheckoutPage() {
       );
 
       clearCart();
+      const itensTxt = data.lines.map(l => `• ${l.qty}x ${l.product.name} — ${formatPrice(l.product.price * l.qty)}`).join("\n");
+      const enderecoTxt =
+        `${addr.street}, ${addr.number}${addr.complement ? ` — ${addr.complement}` : ""}\n` +
+        `${addr.district} — ${addr.city}/${addr.state}\nCEP ${addr.zip}`;
       const msg = encodeURIComponent(
-        `Olá! Acabei de fazer um pedido na Pandex.\n` +
-        `Pedido: ${order.code}\nNome: ${user.name}\nTotal: ${formatPrice(order.total)}\n` +
-        data.lines.map(l => `• ${l.qty}x ${l.product.name}`).join("\n")
+        `🐼 *Novo pedido Pandex Store*\n` +
+        `\n*Pedido:* ${order.code}` +
+        `\n*Cliente:* ${user.name}` +
+        `\n*Telefone:* ${addr.phone}` +
+        `\n*E-mail:* ${user.email}` +
+        `\n\n*Itens:*\n${itensTxt}` +
+        `\n\n*Total:* ${formatPrice(order.total)}` +
+        `\n\n*Entrega:*\n${enderecoTxt}` +
+        (addr.notes ? `\n\n*Obs.:* ${addr.notes}` : "") +
+        `\n\nGostaria de combinar o pagamento, por favor.`
       );
       window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${msg}`, "_blank");
       navigate({ to: "/conta/pedidos/$id", params: { id: order.id } });
