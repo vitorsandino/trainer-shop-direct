@@ -32,8 +32,8 @@ function LoginPage() {
         user = await register({ name, email, phone, password });
         // Dispara o e-mail de boas-vindas (não bloqueia o login, mas loga falhas)
         try {
-          const { sendWelcomeEmail } = await import("@/lib/email.functions");
-          await sendWelcomeEmail({ data: { email, name } });
+          const { sendWelcomeEmail } = await import("@/lib/email-client");
+          await sendWelcomeEmail({ email, name });
         } catch (mailErr: any) {
           console.warn("[email] welcome falhou:", mailErr);
         }

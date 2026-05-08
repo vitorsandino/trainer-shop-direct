@@ -133,8 +133,8 @@ function CheckoutPage() {
       if (finChanged) saveFinance(nextFin);
 
       // dispara e-mail de confirmação (não bloqueia)
-      void import("@/lib/email.functions").then(m =>
-        m.sendOrderConfirmation({ data: {
+      void import("@/lib/email-client").then(m =>
+        m.sendOrderConfirmation({
           email: user.email,
           code: order.code,
           userName: user.name,
@@ -144,14 +144,25 @@ function CheckoutPage() {
             fullName: addr.fullName, street: addr.street, number: addr.number, complement: addr.complement,
             district: addr.district, city: addr.city, state: addr.state, zip: addr.zip,
           },
-        }}).catch(err => console.warn("[email] confirm:", err))
+        }).catch(err => console.warn("[email] confirm:", err))
       );
 
       clearCart();
+      const itensTxt = data.lines.map(l => `• ${l.qty}x ${l.product.name} — ${formatPrice(l.product.price * l.qty)}`).join("\n");
+      const enderecoTxt =
+        `${addr.street}, ${addr.number}${addr.complement ? ` — ${addr.complement}` : ""}\n` +
+        `${addr.district} — ${addr.city}/${addr.state}\nCEP ${addr.zip}`;
       const msg = encodeURIComponent(
-        `Olá! Acabei de fazer um pedido na Pandex.\n` +
-        `Pedido: ${order.code}\nNome: ${user.name}\nTotal: ${formatPrice(order.total)}\n` +
-        data.lines.map(l => `• ${l.qty}x ${l.product.name}`).join("\n")
+        `🐼 *Novo pedido Pandex Store*\n` +
+        `\n*Pedido:* ${order.code}` +
+        `\n*Cliente:* ${user.name}` +
+        `\n*Telefone:* ${addr.phone}` +
+        `\n*E-mail:* ${user.email}` +
+        `\n\n*Itens:*\n${itensTxt}` +
+        `\n\n*Total:* ${formatPrice(order.total)}` +
+        `\n\n*Entrega:*\n${enderecoTxt}` +
+        (addr.notes ? `\n\n*Obs.:* ${addr.notes}` : "") +
+        `\n\nGostaria de combinar o pagamento, por favor.`
       );
       window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${msg}`, "_blank");
       navigate({ to: "/conta/pedidos/$id", params: { id: order.id } });
@@ -199,10 +210,10 @@ function CheckoutPage() {
           <div className="flex justify-between border-t border-border pt-3 font-display text-xl">
             <span>Total</span><span className="text-primary">{formatPrice(data.total)}</span>
           </div>
-          <button disabled={busy} className="w-full rounded-md bg-primary py-3 font-bold text-primary-foreground hover:opacity-90 disabled:opacity-60">
-            {busy ? "Processando..." : "Confirmar pedido"}
+          <button disabled={busy} className="w-full rounded-md bg-[var(--whatsapp)] py-3 font-bold text-[var(--whatsapp-foreground)] hover:brightness-110 disabled:opacity-60">
+            {busy ? "Processando..." : "Enviar pedido pelo WhatsApp"}
           </button>
-          <p className="text-center text-xs text-muted-foreground">Você será redirecionado para o WhatsApp para combinar pagamento.</p>
+          <p className="text-center text-xs text-muted-foreground">Seu pedido será registrado na sua conta e enviado para nosso WhatsApp para combinar o pagamento.</p>
         </aside>
       </form>
     </div>

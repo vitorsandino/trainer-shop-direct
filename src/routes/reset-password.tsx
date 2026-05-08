@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate, useSearch } from "@tanstack/react-router";
 import { useState } from "react";
-import { resetPassword } from "@/lib/email.functions";
+import { verifyPasswordResetToken } from "@/lib/email-client";
 import { resetPasswordByEmail } from "@/lib/auth";
 
 type Search = { token?: string };
@@ -36,7 +36,7 @@ function ResetPage() {
     }
     setBusy(true);
     try {
-      const result = await resetPassword({ data: { token } });
+      const result = await verifyPasswordResetToken({ token });
       await resetPasswordByEmail(result.email, pw);
       setDone(true);
       setTimeout(() => navigate({ to: "/login" }), 2000);

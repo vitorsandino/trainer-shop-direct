@@ -107,11 +107,11 @@ export function updateOrderStatus(id: string, status: OrderStatus, note?: string
   });
   save(list);
   if (target && target.userEmail) {
-    void import("@/lib/email.functions").then(m =>
-      m.sendOrderStatusUpdate({ data: {
+    void import("@/lib/email-client").then(m =>
+      m.sendOrderStatusUpdate({
         email: target!.userEmail, code: target!.code, userName: target!.userName,
         status: target!.status, trackingCode: target!.trackingCode,
-      }}).catch(err => console.warn("[email] status:", err))
+      }).catch(err => console.warn("[email] status:", err))
     );
   }
 }
@@ -124,11 +124,11 @@ export function setTrackingCode(id: string, code: string) {
     return target;
   }));
   if (target && target.userEmail) {
-    void import("@/lib/email.functions").then(m =>
-      m.sendOrderStatusUpdate({ data: {
+    void import("@/lib/email-client").then(m =>
+      m.sendOrderStatusUpdate({
         email: target!.userEmail, code: target!.code, userName: target!.userName,
         status: target!.status, trackingCode: target!.trackingCode,
-      }}).catch(err => console.warn("[email] tracking:", err))
+      }).catch(err => console.warn("[email] tracking:", err))
     );
   }
 }
