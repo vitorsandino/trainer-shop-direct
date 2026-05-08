@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate, useSearch } from "@tanstack/react-router";
 import { useState } from "react";
-import { resetPassword } from "@/lib/email.functions";
+import { verifyPasswordResetToken } from "@/lib/email-client";
 import { resetPasswordByEmail } from "@/lib/auth";
 
 type Search = { token?: string };
