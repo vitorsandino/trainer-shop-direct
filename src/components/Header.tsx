@@ -60,10 +60,10 @@ export function Header() {
 
       {/* Main bar — branco minimal */}
       <div className="border-b border-border bg-card/90 backdrop-blur-xl">
-        <div className="container mx-auto flex h-20 items-center gap-4 px-4">
-          <Link to="/" aria-label="Pandex Store" className="flex items-center">
-            <img src={logoH} alt="Pandex Store" className="hidden h-10 w-auto sm:block" />
-            <img src={logoMark} alt="Pandex Store" className="h-10 w-10 sm:hidden" />
+        <div className="container mx-auto flex h-24 items-center gap-4 px-4">
+          <Link to="/" aria-label="Pandex Store" className="flex items-center gap-2">
+            <img src={logoMark} alt="Pandex Store" className="h-14 w-14 md:h-16 md:w-16" />
+            <span className="hidden font-display text-xl font-bold tracking-tight text-foreground sm:inline">PANDEX <span className="font-normal text-muted-foreground">STORE</span></span>
           </Link>
 
           <nav className="ml-4 hidden items-center gap-1 lg:flex">

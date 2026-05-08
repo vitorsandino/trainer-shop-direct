@@ -34,20 +34,20 @@ function Index() {
           <div className="space-y-6">
             <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/5 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-white/80 backdrop-blur">
               <span className="h-1.5 w-1.5 rounded-full bg-[var(--neon)] shadow-[0_0_8px_var(--neon)]" />
-              Geek · TCG · Colecionáveis
+              Pokémon TCG · Boosters · ETB · Avulsas
             </span>
             <h1 className="font-display text-5xl leading-[0.95] text-balance md:text-7xl lg:text-8xl">
               SUA LOJA<br/>
               <span className="relative inline-block">
-                GEEK
+                DE TCG
                 <span className="absolute -right-3 -top-2 h-3 w-3 rounded-full bg-[var(--neon)] shadow-[0_0_18px_var(--neon)]" />
               </span>{" "}
               <span className="text-white/40">COM</span><br/>
               <span className="bg-gradient-to-r from-white via-white to-[var(--neon)] bg-clip-text text-transparent">PERSONALIDADE.</span>
             </h1>
             <p className="max-w-lg text-base leading-relaxed text-white/70 md:text-lg">
-              Pokémon TCG, colecionáveis e cultura geek selecionados a dedo. Energia jovem,
-              entrega rápida e zero papo de robô — atendimento direto no WhatsApp.
+              Pokémon TCG selecionado a dedo: boosters, ETB, coleções e cartas avulsas.
+              Lacrados originais, postagem rápida e atendimento direto no WhatsApp.
             </p>
             <div className="flex flex-wrap gap-3 pt-2">
               <Link
@@ -71,11 +71,11 @@ function Index() {
             </div>
           </div>
 
-          {/* mascote */}
+          {/* mascote — logo Pandex em card branco */}
           <div className="relative mx-auto hidden md:block">
-            <div className="absolute inset-0 -m-10 rounded-full bg-gradient-to-tr from-[var(--neon)]/20 to-[var(--electric)]/20 blur-3xl" />
-            <div className="relative grid place-items-center rounded-[2.5rem] border border-white/10 bg-white/[0.04] p-10 backdrop-blur">
-              <img src={logoMark} alt="Pandex mascote" className="h-72 w-72 brightness-0 invert" />
+            <div className="absolute inset-0 -m-10 rounded-full bg-gradient-to-tr from-[var(--neon)]/25 to-[var(--electric)]/20 blur-3xl" />
+            <div className="relative grid place-items-center rounded-[2.5rem] border border-white/10 bg-white p-12 backdrop-blur shadow-[var(--shadow-pop)]">
+              <img src={logoMark} alt="Pandex Store" className="h-72 w-72 object-contain" />
               <span className="absolute -left-3 top-6 rounded-full border border-white/20 bg-foreground px-3 py-1 text-[10px] font-bold tracking-widest text-[var(--neon)]">NEW DROP</span>
               <span className="absolute -right-2 bottom-10 rounded-full border border-white/20 bg-foreground px-3 py-1 text-[10px] font-bold tracking-widest text-white">100% ORIGINAL</span>
             </div>
@@ -86,11 +86,11 @@ function Index() {
         <div className="border-y border-white/10 bg-foreground/60">
           <div className="container mx-auto flex flex-wrap items-center justify-between gap-4 px-4 py-3 text-[11px] font-semibold uppercase tracking-[0.25em] text-white/60">
             <span>★ Pokémon TCG</span>
-            <span className="hidden sm:inline">★ Boosters</span>
+            <span>★ Boosters</span>
             <span>★ ETB</span>
-            <span className="hidden sm:inline">★ Colecionáveis</span>
+            <span className="hidden sm:inline">★ Coleções</span>
             <span>★ Cards Avulsos</span>
-            <span className="hidden md:inline">★ Cultura Geek</span>
+            <span className="hidden md:inline">★ Acessórios TCG</span>
           </div>
         </div>
       </section>
