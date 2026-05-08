@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { requestPasswordReset } from "@/lib/email.functions";
+import { requestPasswordReset } from "@/lib/email-client";
 
 export const Route = createFileRoute("/esqueci-senha")({
   component: ForgotPage,
