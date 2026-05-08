@@ -19,7 +19,7 @@ export function Header() {
     if (q.trim()) navigate({ to: "/buscar", search: { q: q.trim() } });
   };
 
-  const navLink = "relative rounded-full px-4 py-2 text-sm font-semibold text-foreground/70 transition hover:text-foreground";
+  const navLink = "relative rounded-full px-4 py-2 text-sm font-semibold text-foreground/70 transition hover:text-[var(--highlight)]";
   const navLinkActive = "relative rounded-full bg-foreground px-4 py-2 text-sm font-semibold text-background shadow-sm";
 
   return (
@@ -59,9 +59,9 @@ export function Header() {
 
       {/* Main bar — branco minimal */}
       <div className="border-b border-border bg-card/90 backdrop-blur-xl">
-        <div className="container mx-auto flex h-32 md:h-40 items-center gap-4 px-4">
+        <div className="container mx-auto flex h-40 md:h-52 items-center gap-4 px-4">
           <Link to="/" aria-label="Pandex Store" className="flex items-center transition-transform hover:scale-105">
-            <img src={logoH} alt="Pandex Store" className="h-24 md:h-32 w-auto object-contain" />
+            <img src={logoH} alt="Pandex Store" className="h-32 md:h-44 w-auto object-contain" />
           </Link>
 
           <nav className="ml-4 hidden items-center gap-1 lg:flex">
