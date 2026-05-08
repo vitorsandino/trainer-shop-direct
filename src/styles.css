@@ -35,8 +35,9 @@
   --color-neon: var(--neon);
   --color-electric: var(--electric);
   --color-pokered: var(--pokered);
-  --font-display: "Fredoka", "Baloo 2", system-ui, sans-serif;
-  --font-sans: "Space Grotesk", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --color-highlight: var(--highlight);
+  --font-display: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
 }
 
 :root {
