@@ -43,7 +43,7 @@ function Index() {
                 <span className="absolute -right-3 -top-2 h-3 w-3 rounded-full bg-[var(--neon)] shadow-[0_0_18px_var(--neon)]" />
               </span>{" "}
               <span className="text-white/40">COM</span><br/>
-              <span className="bg-gradient-to-r from-white via-white to-[var(--neon)] bg-clip-text text-transparent">PERSONALIDADE.</span>
+              <span className="bg-gradient-to-r from-white via-white to-[var(--highlight)] bg-clip-text text-transparent">PERSONALIDADE.</span>
             </h1>
             <p className="max-w-lg text-base leading-relaxed text-white/70 md:text-lg">
               Pokémon TCG selecionado a dedo: boosters, ETB, coleções e cartas avulsas.
