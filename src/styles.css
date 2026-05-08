@@ -43,34 +43,34 @@
   --radius: 1rem;
 
   /* PANDEX — Black & White minimalist with neon accents */
-  --background: oklch(0.985 0 0);          /* off-white / #F6F6F6 vibe */
-  --foreground: oklch(0.12 0 0);           /* near absolute black */
-  --card: oklch(1 0 0);                    /* pure white */
-  --card-foreground: oklch(0.12 0 0);
+  --background: oklch(0.985 0 0);          /* off-white */
+  --foreground: #000401;                   /* preto Pandex #000401 */
+  --card: oklch(1 0 0);
+  --card-foreground: #000401;
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.12 0 0);
+  --popover-foreground: #000401;
 
-  /* Primary = absolute black (panda preto) */
-  --primary: oklch(0.12 0 0);
+  /* Primary = preto absoluto Pandex */
+  --primary: #000401;
   --primary-foreground: oklch(1 0 0);
 
   /* Secondary = soft light gray */
   --secondary: oklch(0.95 0 0);            /* #F2F2F2 */
-  --secondary-foreground: oklch(0.12 0 0);
+  --secondary-foreground: #000401;
 
   --muted: oklch(0.96 0 0);
   --muted-foreground: oklch(0.45 0 0);
 
   /* Accent = neon green (geek) */
   --accent: oklch(0.88 0.22 145);
-  --accent-foreground: oklch(0.12 0 0);
+  --accent-foreground: #000401;
 
   --destructive: oklch(0.62 0.24 25);
   --destructive-foreground: oklch(1 0 0);
 
   --border: oklch(0.9 0 0);
   --input: oklch(0.97 0 0);
-  --ring: oklch(0.12 0 0);
+  --ring: #000401;
 
   /* Geek accent palette (uso pontual) */
   --neon: oklch(0.88 0.22 145);            /* verde neon */
@@ -81,11 +81,11 @@
   --whatsapp-foreground: oklch(1 0 0);
 
   /* Topbar PRETO minimal */
-  --topbar: oklch(0.12 0 0);
+  --topbar: #000401;
   --topbar-foreground: oklch(1 0 0);
 
   --gradient-hero: radial-gradient(120% 80% at 0% 0%, oklch(0.97 0 0), oklch(1 0 0) 60%);
-  --gradient-dark: linear-gradient(135deg, oklch(0.12 0 0), oklch(0.22 0 0));
+  --gradient-dark: linear-gradient(135deg, #000401, #1a1a1a);
   --gradient-neon: linear-gradient(135deg, var(--neon), var(--electric));
   --shadow-glow: 0 0 32px oklch(0.88 0.22 145 / 0.45);
   --shadow-glow-blue: 0 0 32px oklch(0.7 0.2 250 / 0.45);
