@@ -5,7 +5,6 @@ import { WHATSAPP_NUMBER } from "@/lib/products";
 import { useAuth, useCartCount } from "@/hooks/use-auth";
 import { logout } from "@/lib/auth";
 import logoH from "@/assets/pandex-logo-horizontal.png";
-import logoMark from "@/assets/pandex-logo.png";
 
 export function Header() {
   const navigate = useNavigate();
