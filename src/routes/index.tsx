@@ -215,11 +215,11 @@ function Index() {
             { icon: MessageCircle, title: "Atendimento humano", text: "Direto no WhatsApp." },
           ].map((it, i) => (
             <div key={i} className="group relative overflow-hidden rounded-3xl border border-border bg-card p-6 transition glow-hover hover:-translate-y-1 hover:border-foreground">
-              <div className="grid h-12 w-12 place-items-center rounded-2xl bg-foreground text-background transition group-hover:bg-[var(--neon)] group-hover:text-foreground">
+              <div className="grid h-12 w-12 place-items-center rounded-2xl bg-foreground text-background transition group-hover:bg-[var(--highlight)] group-hover:text-white">
                 <it.icon className="h-5 w-5" />
               </div>
-              <p className="mt-4 font-display text-lg transition-colors group-hover:text-[var(--highlight)]">{it.title}</p>
-              <p className="text-sm text-muted-foreground transition-colors group-hover:text-[var(--highlight)]">{it.text}</p>
+              <p className="mt-4 font-display text-lg">{it.title}</p>
+              <p className="text-sm text-muted-foreground">{it.text}</p>
             </div>
           ))}
         </div>
