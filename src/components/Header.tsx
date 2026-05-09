@@ -19,7 +19,7 @@ export function Header() {
     if (q.trim()) navigate({ to: "/buscar", search: { q: q.trim() } });
   };
 
-  const navLink = "relative rounded-full px-4 py-2 text-sm font-semibold text-foreground/70 transition hover:text-[var(--highlight)]";
+  const navLink = "relative rounded-full px-4 py-2 text-sm font-semibold text-foreground/70 transition hover:text-foreground";
   const navLinkActive = "relative rounded-full bg-foreground px-4 py-2 text-sm font-semibold text-background shadow-sm";
 
   return (
