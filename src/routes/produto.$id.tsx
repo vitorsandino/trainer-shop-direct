@@ -74,7 +74,7 @@ function ProductPage() {
       <div className="grid gap-6 md:gap-10 lg:grid-cols-2">
         {/* Galeria */}
         <div>
-          <div className="group relative aspect-square overflow-hidden rounded-3xl border border-border bg-gradient-to-br from-[#141432] to-[#0a0a1a]">
+          <div className="group relative aspect-square overflow-hidden rounded-3xl border border-border bg-secondary">
             {hasImages && (
               <>
                 <img

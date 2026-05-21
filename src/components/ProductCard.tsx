@@ -10,9 +10,9 @@ export function ProductCard({ product }: { product: Product }) {
   const outOfStock = typeof product.stock === "number" && product.stock <= 0;
 
   return (
-    <div className="group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-card transition duration-300 hover:-translate-y-1 hover:border-primary/70 hover:shadow-[var(--shadow-glow-soft)]">
+    <div className="group relative flex flex-col overflow-hidden rounded-xl border border-border bg-card transition duration-300 hover:-translate-y-0.5 hover:border-primary/60 hover:shadow-[var(--shadow-card)]">
       <Link to="/produto/$id" params={{ id: product.id }} className="flex flex-1 flex-col">
-        <div className="relative aspect-[4/5] w-full overflow-hidden bg-gradient-to-br from-[#1a1a3a] to-[#0a0a1a]">
+        <div className="relative aspect-[4/5] w-full overflow-hidden bg-secondary">
           {hasImg ? (
             <>
               <img
@@ -30,7 +30,6 @@ export function ProductCard({ product }: { product: Product }) {
                   className="absolute inset-0 h-full w-full object-contain p-3 opacity-0 transition-opacity duration-500 group-hover:opacity-100 sm:p-5"
                 />
               )}
-              <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#0a0a1a]/60 via-transparent to-transparent" />
             </>
           ) : (
             <div className="grid h-full w-full place-items-center text-muted-foreground">
