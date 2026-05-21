@@ -30,6 +30,8 @@ function resolveEntrypointPath(entry) {
   const candidates = [
     path.isAbsolute(entry) ? entry : path.resolve(root, entry),
     path.resolve(distServer, entry),
+    path.resolve(distServer, "index.js"),
+    path.resolve(distServer, "index.mjs"),
   ];
   return candidates.find((candidate) => fs.existsSync(candidate)) ?? candidates[0];
 }
