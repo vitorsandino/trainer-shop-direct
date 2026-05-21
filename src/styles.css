@@ -43,56 +43,57 @@
 :root {
   --radius: 1rem;
 
-  /* PANDEX — Black & White minimalist with neon accents */
-  --background: oklch(0.985 0 0);          /* off-white */
-  --foreground: #000401;                   /* preto Pandex #000401 */
-  --card: oklch(1 0 0);
-  --card-foreground: #000401;
-  --popover: oklch(1 0 0);
-  --popover-foreground: #000401;
+  /* PANDEX — Midnight Indigo dark catálogo premium */
+  --background: #0a0a1a;
+  --foreground: #f5f5fa;
 
-  /* Primary = preto absoluto Pandex */
-  --primary: #000401;
-  --primary-foreground: oklch(1 0 0);
+  --card: #141432;
+  --card-foreground: #f5f5fa;
+  --popover: #141432;
+  --popover-foreground: #f5f5fa;
 
-  /* Secondary = soft light gray */
-  --secondary: oklch(0.95 0 0);            /* #F2F2F2 */
-  --secondary-foreground: #000401;
+  /* Primary = indigo elétrico */
+  --primary: #4f46e5;
+  --primary-foreground: #ffffff;
 
-  --muted: oklch(0.96 0 0);
-  --muted-foreground: oklch(0.45 0 0);
+  /* Secondary = navy intermediário */
+  --secondary: #1e1e5a;
+  --secondary-foreground: #e6e6f5;
 
-  /* Accent = neon green (geek) */
-  --accent: oklch(0.88 0.22 145);
-  --accent-foreground: #000401;
+  --muted: #1a1a3a;
+  --muted-foreground: #9ca0c4;
 
-  --destructive: oklch(0.62 0.24 25);
-  --destructive-foreground: oklch(1 0 0);
+  --accent: #6366f1;
+  --accent-foreground: #ffffff;
 
-  --border: oklch(0.9 0 0);
-  --input: oklch(0.97 0 0);
-  --ring: #000401;
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
 
-  /* Geek accent palette (uso pontual) */
-  --neon: oklch(0.88 0.22 145);            /* verde neon */
-  --electric: oklch(0.7 0.2 250);          /* azul elétrico */
-  --pokered: oklch(0.62 0.24 25);          /* vermelho pokédex */
-  --highlight: #BE2C5D;                    /* rosa/magenta destaque de texto */
+  --border: #1f1f45;
+  --input: #15153a;
+  --ring: #4f46e5;
 
-  --whatsapp: oklch(0.7 0.18 150);
-  --whatsapp-foreground: oklch(1 0 0);
+  /* Accents */
+  --neon: #818cf8;          /* indigo claro = "neon" no tema */
+  --electric: #4f46e5;
+  --pokered: #ef4444;
+  --highlight: #818cf8;     /* destaque texto */
 
-  /* Topbar PRETO minimal */
-  --topbar: #000401;
-  --topbar-foreground: oklch(1 0 0);
+  /* WhatsApp mantém verde clássico */
+  --whatsapp: #25D366;
+  --whatsapp-foreground: #0a0a1a;
 
-  --gradient-hero: radial-gradient(120% 80% at 0% 0%, oklch(0.97 0 0), oklch(1 0 0) 60%);
-  --gradient-dark: linear-gradient(135deg, #000401, #1a1a1a);
-  --gradient-neon: linear-gradient(135deg, var(--neon), var(--electric));
-  --shadow-glow: 0 0 32px oklch(0.88 0.22 145 / 0.45);
-  --shadow-glow-blue: 0 0 32px oklch(0.7 0.2 250 / 0.45);
-  --shadow-card: 0 10px 40px -8px oklch(0 0 0 / 0.18);
-  --shadow-pop: 0 14px 50px -10px oklch(0 0 0 / 0.28);
+  /* Topbar = navy profundo */
+  --topbar: #050516;
+  --topbar-foreground: #e6e6f5;
+
+  --gradient-hero: radial-gradient(120% 80% at 0% 0%, #1e1e5a 0%, #0a0a1a 60%);
+  --gradient-dark: linear-gradient(135deg, #0a0a1a, #141432);
+  --gradient-indigo: linear-gradient(135deg, #4f46e5, #818cf8);
+  --shadow-glow: 0 0 32px rgba(79, 70, 229, 0.45);
+  --shadow-glow-soft: 0 0 24px rgba(129, 140, 248, 0.35);
+  --shadow-card: 0 10px 40px -8px rgba(0, 0, 0, 0.55);
+  --shadow-pop: 0 14px 50px -10px rgba(0, 0, 0, 0.75);
 }
 
 
@@ -102,63 +103,39 @@
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
-    /* sutil padrão de "olho de panda" no fundo */
     background-image:
-      radial-gradient(circle at 12% 18%, oklch(0 0 0 / 0.04) 0 1px, transparent 1.5px),
-      radial-gradient(circle at 88% 82%, oklch(0 0 0 / 0.04) 0 1px, transparent 1.5px);
-    background-size: 38px 38px, 38px 38px;
-    background-position: 0 0, 19px 19px;
+      radial-gradient(circle at 12% 8%, rgba(79, 70, 229, 0.18) 0, transparent 45%),
+      radial-gradient(circle at 88% 0%, rgba(129, 140, 248, 0.12) 0, transparent 40%);
     background-attachment: fixed;
     font-family: var(--font-sans);
     font-feature-settings: "ss01", "cv11";
   }
-  h1, h2, h3, h4 { font-family: var(--font-display); letter-spacing: -0.02em; font-weight: 600; }
-  ::selection { background: var(--highlight); color: #fff; }
+  h1, h2, h3, h4 { font-family: var(--font-display); letter-spacing: -0.02em; font-weight: 700; }
+  ::selection { background: var(--primary); color: #fff; }
 }
 
 @layer utilities {
   .text-balance { text-wrap: balance; }
   .text-highlight { color: var(--highlight); }
   .glow-hover { transition: box-shadow .35s ease, transform .35s ease, border-color .35s ease; }
-  .glow-hover:hover { box-shadow: var(--shadow-glow); }
-  .ring-neon { box-shadow: 0 0 0 1px var(--neon), 0 0 22px oklch(0.88 0.22 145 / 0.35); }
-  .panda-grid {
+  .glow-hover:hover { box-shadow: var(--shadow-glow-soft); }
+  .ring-neon { box-shadow: 0 0 0 1px var(--primary), 0 0 22px rgba(79, 70, 229, 0.35); }
+
+  .grid-fade {
     background-image:
-      radial-gradient(circle, oklch(0 0 0 / 0.06) 1.4px, transparent 1.6px);
-    background-size: 22px 22px;
+      linear-gradient(rgba(129,140,248,0.08) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(129,140,248,0.08) 1px, transparent 1px);
+    background-size: 36px 36px;
   }
 
-  /* Button animations */
   .btn-anim {
     transition: transform .25s ease, box-shadow .25s ease, background-color .25s ease, color .25s ease, filter .25s ease;
     will-change: transform;
   }
-  .btn-anim:hover { transform: translateY(-2px) scale(1.03); box-shadow: 0 12px 30px -10px color-mix(in oklab, var(--highlight) 50%, transparent); }
+  .btn-anim:hover { transform: translateY(-2px) scale(1.02); }
   .btn-anim:active { transform: translateY(0) scale(0.98); }
-
-  .btn-shine {
-    position: relative;
-    overflow: hidden;
-    isolation: isolate;
-  }
-  .btn-shine::after {
-    content: "";
-    position: absolute; inset: 0;
-    background: linear-gradient(120deg, transparent 30%, rgba(255,255,255,0.45) 50%, transparent 70%);
-    transform: translateX(-120%);
-    transition: transform .7s ease;
-    pointer-events: none;
-  }
-  .btn-shine:hover::after { transform: translateX(120%); }
-
-  @keyframes pulse-highlight {
-    0%, 100% { box-shadow: 0 0 0 0 color-mix(in oklab, var(--highlight) 60%, transparent); }
-    50% { box-shadow: 0 0 0 12px color-mix(in oklab, var(--highlight) 0%, transparent); }
-  }
-  .pulse-highlight { animation: pulse-highlight 2s ease-in-out infinite; }
 }
 
-/* Apply default animation to all <button> and role=button (excluding shadcn-handled disabled state) */
 @layer base {
   button:not(:disabled), a[role="button"], .btn {
     transition: transform .2s ease, box-shadow .25s ease, background-color .2s ease, color .2s ease, opacity .2s ease, filter .2s ease;
@@ -169,5 +146,10 @@
   button:not(:disabled):active, a[role="button"]:active, .btn:active {
     transform: translateY(0) scale(0.98);
   }
-}
 
+  /* scrollbar dark */
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-track { background: #0a0a1a; }
+  ::-webkit-scrollbar-thumb { background: #1f1f45; border-radius: 8px; }
+  ::-webkit-scrollbar-thumb:hover { background: #2d2d6e; }
+}

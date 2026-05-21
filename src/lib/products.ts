@@ -3,10 +3,12 @@ export type Category = string;
 export type CategoryDef = { value: string; label: string };
 
 const DEFAULT_CATEGORIES: CategoryDef[] = [
-  { value: "booster", label: "Booster" },
-  { value: "box", label: "Box" },
+  { value: "booster", label: "Boosters" },
+  { value: "etb", label: "ETBs" },
+  { value: "box", label: "Boxes" },
   { value: "colecoes", label: "Coleções" },
-  { value: "avulsas", label: "Cards Avulsas" },
+  { value: "avulsas", label: "Cartas Avulsas" },
+  { value: "acessorios", label: "Acessórios" },
 ];
 
 const CAT_KEY = "pkmn_categories_v1";
