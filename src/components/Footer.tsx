@@ -16,12 +16,16 @@ export function Footer() {
           </p>
           <div className="mt-5 flex items-center gap-2">
             <a href={`https://wa.me/${WHATSAPP_NUMBER}`} target="_blank" rel="noopener noreferrer" aria-label="WhatsApp"
-              className="grid h-10 w-10 place-items-center rounded-full border border-border transition hover:border-[var(--whatsapp)] hover:text-[var(--whatsapp)]">
+              className="grid h-10 w-10 place-items-center rounded-full border border-border bg-card transition hover:border-[var(--whatsapp)] hover:text-[var(--whatsapp)]">
               <MessageCircle className="h-4 w-4" />
             </a>
             <a href="https://instagram.com/pandex.store" target="_blank" rel="noopener noreferrer" aria-label="Instagram"
-              className="grid h-10 w-10 place-items-center rounded-full border border-border transition hover:border-[var(--highlight)] hover:text-[var(--highlight)]">
+              className="grid h-10 w-10 place-items-center rounded-full border border-border bg-card transition hover:border-[var(--highlight)] hover:text-[var(--highlight)]">
               <Instagram className="h-4 w-4" />
+            </a>
+            <a href={MYPCARDS_URL} target="_blank" rel="noopener noreferrer" aria-label="MyPCards"
+              className="inline-flex h-10 items-center gap-1.5 rounded-full border border-border bg-card px-3 text-xs font-semibold transition hover:border-primary hover:text-primary">
+              <ExternalLink className="h-3.5 w-3.5" /> MyPCards
             </a>
           </div>
         </div>
