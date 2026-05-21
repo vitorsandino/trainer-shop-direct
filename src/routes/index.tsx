@@ -52,35 +52,26 @@ function Index() {
             </div>
           </div>
 
-          <Link to={hero ? "/produto/$id" : "/"} params={hero ? { id: hero.id } : (undefined as never)}
-            className="group relative overflow-hidden rounded-3xl border border-border bg-white shadow-[var(--shadow-card)]">
-            <div className="relative aspect-[4/3] w-full overflow-hidden bg-secondary">
-              {hero?.images[0] ? (
-                <img src={hero.images[0]} alt={hero.name}
-                  className="absolute inset-0 h-full w-full object-contain p-8 transition-transform duration-700 group-hover:scale-105" />
-              ) : (
-                <div className="absolute inset-0 grid place-items-center">
-                  <img src={logoMark} alt="Pandex" className="h-40 w-40 object-contain opacity-80" />
-                </div>
-              )}
-              {hero?.featured && (
-                <span className="absolute left-4 top-4 rounded-full bg-primary px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-primary-foreground">
-                  ★ Destaque da semana
-                </span>
-              )}
+          <div className="relative overflow-hidden rounded-3xl border border-border bg-white p-6 shadow-[var(--shadow-card)] md:p-10">
+            <div className="pointer-events-none absolute -right-16 -top-16 h-64 w-64 rounded-full bg-primary/10 blur-3xl" />
+            <div className="pointer-events-none absolute -bottom-20 -left-10 h-64 w-64 rounded-full bg-accent blur-3xl" />
+            <div className="relative grid place-items-center">
+              <img src={pandaMark} alt="Pandex Store" className="h-64 w-auto object-contain md:h-80" />
             </div>
             {hero && (
-              <div className="flex items-center justify-between gap-4 border-t border-border p-5">
+              <Link to="/produto/$id" params={{ id: hero.id }}
+                className="relative mt-4 flex items-center justify-between gap-4 rounded-2xl border border-border bg-secondary p-4 transition hover:border-primary">
                 <div className="min-w-0">
-                  <p className="line-clamp-1 font-display text-lg text-foreground">{hero.name}</p>
+                  <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary">★ Destaque da semana</p>
+                  <p className="line-clamp-1 mt-1 font-display text-base text-foreground">{hero.name}</p>
                   <p className="text-sm font-semibold text-primary">{hero.price.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}</p>
                 </div>
                 <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-primary px-4 py-2 text-xs font-bold text-primary-foreground">
-                  Ver produto <ArrowRight className="h-3.5 w-3.5" />
+                  Ver <ArrowRight className="h-3.5 w-3.5" />
                 </span>
-              </div>
+              </Link>
             )}
-          </Link>
+          </div>
         </div>
       </section>
 
