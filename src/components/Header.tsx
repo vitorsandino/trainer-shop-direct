@@ -85,8 +85,8 @@ export function Header() {
       {/* Main bar */}
       <div className="border-b border-border bg-background/85 backdrop-blur-xl">
         <div className="container mx-auto flex h-20 items-center gap-4 px-4 md:h-24">
-          <Link to="/" aria-label="Pandex Store" className="flex items-center transition-transform hover:scale-105">
-            <img src={logoH} alt="Pandex Store" className="h-14 w-auto object-contain md:h-20" />
+          <Link to="/" aria-label="Pandex Store" className="flex items-center gap-2 transition-transform hover:scale-[1.02]">
+            <img src={logoH} alt="Pandex Store" className="h-10 w-auto object-contain md:h-14" />
           </Link>
 
           <nav className="ml-2 hidden items-center gap-1 lg:flex">
@@ -98,6 +98,7 @@ export function Header() {
               </Link>
             ))}
             <Link to="/contato" className={path === "/contato" ? navLinkActive : navLink}>Contato</Link>
+            <Link to="/pokemon" className={path === "/pokemon" ? navLinkActive : navLink}>Pokémon</Link>
           </nav>
 
           <div ref={wrapRef} className="relative ml-auto hidden flex-1 max-w-md md:block">
