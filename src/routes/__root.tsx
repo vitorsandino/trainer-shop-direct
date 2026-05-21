@@ -93,6 +93,7 @@ function RootComponent() {
       <Header />
       <main className="flex-1"><Outlet /></main>
       <Footer />
+      <FloatingWhatsApp />
     </div>
   );
 }
