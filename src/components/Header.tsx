@@ -1,5 +1,5 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
-import { Search, Menu, X, Instagram, User, ChevronDown, LogOut, Package, MessageCircle } from "lucide-react";
+import { Search, Menu, X, Instagram, User, ChevronDown, LogOut, Package, MessageCircle, ExternalLink } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { CATEGORIES, WHATSAPP_NUMBER, getProducts, subscribeProducts, type Product } from "@/lib/products";
 import { useAuth } from "@/hooks/use-auth";
