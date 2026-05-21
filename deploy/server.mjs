@@ -3,7 +3,7 @@
 //   (Cloudflare Worker não suporta SMTP/TCP).
 // - Todo o resto é encaminhado para o Miniflare (SSR + assets).
 import { Miniflare, Log, LogLevel } from "miniflare";
-import { unstable_getMiniflareWorkerOptions, unstable_readConfig } from "wrangler";
+import { unstable_getMiniflareWorkerOptions } from "wrangler";
 import nodemailer from "nodemailer";
 import http from "node:http";
 import crypto from "node:crypto";
@@ -25,35 +25,50 @@ const PORT = Number(process.env.PORT || 3000);
 const HOST = process.env.HOST || "127.0.0.1";
 
 const { main, workerOptions } = await unstable_getMiniflareWorkerOptions(wranglerJson);
-const resolvedConfig = unstable_readConfig({ config: wranglerJson });
+
+function resolveEntrypointPath(entry) {
+  const candidates = [
+    path.isAbsolute(entry) ? entry : path.resolve(root, entry),
+    path.resolve(distServer, entry),
+  ];
+  return candidates.find((candidate) => fs.existsSync(candidate)) ?? candidates[0];
+}
 
 function buildManualModules() {
-  const bundle = resolvedConfig?.config?.bundle;
-  if (!bundle || resolvedConfig?.config?.format !== "modules") return null;
+  if (!fs.existsSync(distServer)) return null;
 
-  const scriptPath = bundle.path;
-  const modulesRoot = path.dirname(scriptPath);
-  const entryModule = {
-    type: "ESModule",
-    path: scriptPath,
-    contents: bundle.entrypointSource,
-  };
+  const entryPath = resolveEntrypointPath(main);
+  const allowedExtensions = new Set([".js", ".mjs", ".cjs", ".wasm", ".txt", ".html", ".json"]);
+  const modulePaths = [];
 
-  const extraModules = (bundle.modules ?? []).map((mod) => ({
-    type: mod.type === "compiled-wasm"
+  function walk(dir) {
+    for (const item of fs.readdirSync(dir, { withFileTypes: true })) {
+      const absolute = path.join(dir, item.name);
+      if (item.isDirectory()) {
+        walk(absolute);
+        continue;
+      }
+      if (absolute === wranglerJson) continue;
+      if (!allowedExtensions.has(path.extname(absolute))) continue;
+      modulePaths.push(absolute);
+    }
+  }
+
+  walk(distServer);
+
+  const orderedPaths = [entryPath, ...modulePaths.filter((file) => file !== entryPath)];
+  const modules = orderedPaths.map((file) => ({
+    type: path.extname(file) === ".wasm"
       ? "CompiledWasm"
-      : mod.type === "text"
-        ? "Text"
-        : mod.type === "buffer"
-          ? "Data"
-          : mod.type === "commonjs"
-            ? "CommonJS"
-            : "ESModule",
-    path: path.resolve(modulesRoot, mod.name),
-    contents: mod.content,
+      : path.extname(file) === ".cjs"
+        ? "CommonJS"
+        : path.extname(file) === ".txt" || path.extname(file) === ".html" || path.extname(file) === ".json"
+          ? "Text"
+          : "ESModule",
+    path: file,
   }));
 
-  return { modulesRoot, modules: [entryModule, ...extraModules] };
+  return { modulesRoot: root, modules };
 }
 
 const manualModules = buildManualModules();
