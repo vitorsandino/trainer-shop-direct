@@ -3,7 +3,7 @@
 //   (Cloudflare Worker não suporta SMTP/TCP).
 // - Todo o resto é encaminhado para o Miniflare (SSR + assets).
 import { Miniflare, Log, LogLevel } from "miniflare";
-import { unstable_getMiniflareWorkerOptions } from "wrangler";
+import { unstable_getMiniflareWorkerOptions, unstable_readConfig } from "wrangler";
 import nodemailer from "nodemailer";
 import http from "node:http";
 import crypto from "node:crypto";
@@ -25,6 +25,38 @@ const PORT = Number(process.env.PORT || 3000);
 const HOST = process.env.HOST || "127.0.0.1";
 
 const { main, workerOptions } = await unstable_getMiniflareWorkerOptions(wranglerJson);
+const resolvedConfig = unstable_readConfig({ config: wranglerJson });
+
+function buildManualModules() {
+  const bundle = resolvedConfig?.config?.bundle;
+  if (!bundle || resolvedConfig?.config?.format !== "modules") return null;
+
+  const scriptPath = bundle.path;
+  const modulesRoot = path.dirname(scriptPath);
+  const entryModule = {
+    type: "ESModule",
+    path: scriptPath,
+    contents: bundle.entrypointSource,
+  };
+
+  const extraModules = (bundle.modules ?? []).map((mod) => ({
+    type: mod.type === "compiled-wasm"
+      ? "CompiledWasm"
+      : mod.type === "text"
+        ? "Text"
+        : mod.type === "buffer"
+          ? "Data"
+          : mod.type === "commonjs"
+            ? "CommonJS"
+            : "ESModule",
+    path: path.resolve(modulesRoot, mod.name),
+    contents: mod.content,
+  }));
+
+  return { modulesRoot, modules: [entryModule, ...extraModules] };
+}
+
+const manualModules = buildManualModules();
 
 // Carrega .env (se existir) e injeta no Worker como bindings de env
 const envFile = path.join(root, ".env");
@@ -54,9 +86,9 @@ for (const k of passKeys) {
 
 const mf = new Miniflare({
   log: new Log(LogLevel.INFO),
-  modules: true,
+  modules: manualModules?.modules ?? true,
   scriptPath: main,
-  modulesRoot: distServer,
+  modulesRoot: manualModules?.modulesRoot ?? distServer,
   ...workerOptions,
   bindings: { ...(workerOptions.bindings || {}), ...injectedBindings },
 });
