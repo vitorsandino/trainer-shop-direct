@@ -26,6 +26,55 @@ const HOST = process.env.HOST || "127.0.0.1";
 
 const { main, workerOptions } = await unstable_getMiniflareWorkerOptions(wranglerJson);
 
+function resolveEntrypointPath(entry) {
+  const candidates = [
+    path.isAbsolute(entry) ? entry : path.resolve(root, entry),
+    path.resolve(distServer, entry),
+    path.resolve(distServer, "index.js"),
+    path.resolve(distServer, "index.mjs"),
+  ];
+  return candidates.find((candidate) => fs.existsSync(candidate)) ?? candidates[0];
+}
+
+function buildManualModules() {
+  if (!fs.existsSync(distServer)) return null;
+
+  const entryPath = resolveEntrypointPath(main);
+  const allowedExtensions = new Set([".js", ".mjs", ".cjs", ".wasm", ".txt", ".html", ".json"]);
+  const modulePaths = [];
+
+  function walk(dir) {
+    for (const item of fs.readdirSync(dir, { withFileTypes: true })) {
+      const absolute = path.join(dir, item.name);
+      if (item.isDirectory()) {
+        walk(absolute);
+        continue;
+      }
+      if (absolute === wranglerJson) continue;
+      if (!allowedExtensions.has(path.extname(absolute))) continue;
+      modulePaths.push(absolute);
+    }
+  }
+
+  walk(distServer);
+
+  const orderedPaths = [entryPath, ...modulePaths.filter((file) => file !== entryPath)];
+  const modules = orderedPaths.map((file) => ({
+    type: path.extname(file) === ".wasm"
+      ? "CompiledWasm"
+      : path.extname(file) === ".cjs"
+        ? "CommonJS"
+        : path.extname(file) === ".txt" || path.extname(file) === ".html" || path.extname(file) === ".json"
+          ? "Text"
+          : "ESModule",
+    path: file,
+  }));
+
+  return { modulesRoot: root, modules };
+}
+
+const manualModules = buildManualModules();
+
 // Carrega .env (se existir) e injeta no Worker como bindings de env
 const envFile = path.join(root, ".env");
 const envFromFile = {};
@@ -54,9 +103,9 @@ for (const k of passKeys) {
 
 const mf = new Miniflare({
   log: new Log(LogLevel.INFO),
-  modules: true,
+  modules: manualModules?.modules ?? true,
   scriptPath: main,
-  modulesRoot: distServer,
+  modulesRoot: manualModules?.modulesRoot ?? distServer,
   ...workerOptions,
   bindings: { ...(workerOptions.bindings || {}), ...injectedBindings },
 });
