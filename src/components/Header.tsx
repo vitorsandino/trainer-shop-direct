@@ -46,7 +46,7 @@ export function Header() {
     }
   };
 
-  const navLink = "rounded-full px-3.5 py-1.5 text-sm font-medium text-foreground/70 transition hover:text-foreground hover:bg-white/5";
+  const navLink = "rounded-full px-3.5 py-1.5 text-sm font-medium text-foreground/70 transition hover:text-foreground hover:bg-secondary";
   const navLinkActive = "rounded-full bg-primary px-3.5 py-1.5 text-sm font-semibold text-primary-foreground";
 
   return (
