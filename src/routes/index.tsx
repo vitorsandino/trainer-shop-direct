@@ -4,7 +4,7 @@ import { ShieldCheck, MessageCircle, ArrowRight, Truck, Instagram, ChevronLeft, 
 import { CATEGORIES, getProducts, subscribeProducts, type Product, whatsappLink, WHATSAPP_NUMBER } from "@/lib/products";
 import { ProductCard } from "@/components/ProductCard";
 import { CollectionsShowcase } from "@/components/CollectionsShowcase";
-import logoMark from "@/assets/pandex-logo.png";
+import pandaMark from "@/assets/pandex-panda.png";
 
 export const Route = createFileRoute("/")({
   component: Index,
