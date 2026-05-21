@@ -1,5 +1,5 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
-import { Search, Menu, X, Instagram, User, ChevronDown, LogOut, Package, MessageCircle } from "lucide-react";
+import { Search, Menu, X, Instagram, User, ChevronDown, LogOut, Package, MessageCircle, ExternalLink } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { CATEGORIES, WHATSAPP_NUMBER, getProducts, subscribeProducts, type Product } from "@/lib/products";
 import { useAuth } from "@/hooks/use-auth";
@@ -46,7 +46,7 @@ export function Header() {
     }
   };
 
-  const navLink = "rounded-full px-3.5 py-1.5 text-sm font-medium text-foreground/70 transition hover:text-foreground hover:bg-white/5";
+  const navLink = "rounded-full px-3.5 py-1.5 text-sm font-medium text-foreground/70 transition hover:text-foreground hover:bg-secondary";
   const navLinkActive = "rounded-full bg-primary px-3.5 py-1.5 text-sm font-semibold text-primary-foreground";
 
   return (
@@ -59,6 +59,7 @@ export function Header() {
             Atendimento via WhatsApp · Produtos originais · Postagem rápida
           </span>
           <div className="flex items-center gap-1">
+            <a href="https://mypcards.com/pandextcg" target="_blank" rel="noopener noreferrer" className="hidden items-center gap-1 rounded-full px-2 py-0.5 transition hover:bg-white/10 sm:inline-flex"><ExternalLink className="h-3 w-3" /> MyPCards</a>
             <a href="https://instagram.com/pandex.store" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="grid h-6 w-6 place-items-center rounded-full transition hover:bg-white/10"><Instagram className="h-3.5 w-3.5" /></a>
             <a href={`https://wa.me/${WHATSAPP_NUMBER}`} target="_blank" rel="noopener noreferrer" aria-label="WhatsApp" className="grid h-6 w-6 place-items-center rounded-full transition hover:bg-white/10"><MessageCircle className="h-3.5 w-3.5" /></a>
             {user ? (

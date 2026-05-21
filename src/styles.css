@@ -43,57 +43,54 @@
 :root {
   --radius: 1rem;
 
-  /* PANDEX — Midnight Indigo dark catálogo premium */
-  --background: #0a0a1a;
-  --foreground: #f5f5fa;
+  /* PANDEX — Light catálogo limpo, fundo branco */
+  --background: #ffffff;
+  --foreground: #0f1020;
 
-  --card: #141432;
-  --card-foreground: #f5f5fa;
-  --popover: #141432;
-  --popover-foreground: #f5f5fa;
+  --card: #ffffff;
+  --card-foreground: #0f1020;
+  --popover: #ffffff;
+  --popover-foreground: #0f1020;
 
   /* Primary = indigo elétrico */
   --primary: #4f46e5;
   --primary-foreground: #ffffff;
 
-  /* Secondary = navy intermediário */
-  --secondary: #1e1e5a;
-  --secondary-foreground: #e6e6f5;
+  --secondary: #f3f4f9;
+  --secondary-foreground: #0f1020;
 
-  --muted: #1a1a3a;
-  --muted-foreground: #9ca0c4;
+  --muted: #f5f6fb;
+  --muted-foreground: #5b607a;
 
-  --accent: #6366f1;
-  --accent-foreground: #ffffff;
+  --accent: #eef0ff;
+  --accent-foreground: #4f46e5;
 
   --destructive: #ef4444;
   --destructive-foreground: #ffffff;
 
-  --border: #1f1f45;
-  --input: #15153a;
+  --border: #e6e7ef;
+  --input: #ffffff;
   --ring: #4f46e5;
 
-  /* Accents */
-  --neon: #818cf8;          /* indigo claro = "neon" no tema */
+  --neon: #6366f1;
   --electric: #4f46e5;
   --pokered: #ef4444;
-  --highlight: #818cf8;     /* destaque texto */
+  --highlight: #4f46e5;
 
-  /* WhatsApp mantém verde clássico */
   --whatsapp: #25D366;
-  --whatsapp-foreground: #0a0a1a;
+  --whatsapp-foreground: #ffffff;
 
   /* Topbar = navy profundo */
-  --topbar: #050516;
-  --topbar-foreground: #e6e6f5;
+  --topbar: #0f1020;
+  --topbar-foreground: #f5f6fb;
 
-  --gradient-hero: radial-gradient(120% 80% at 0% 0%, #1e1e5a 0%, #0a0a1a 60%);
-  --gradient-dark: linear-gradient(135deg, #0a0a1a, #141432);
+  --gradient-hero: radial-gradient(120% 80% at 0% 0%, #eef0ff 0%, #ffffff 60%);
+  --gradient-dark: linear-gradient(135deg, #ffffff, #f5f6fb);
   --gradient-indigo: linear-gradient(135deg, #4f46e5, #818cf8);
-  --shadow-glow: 0 0 32px rgba(79, 70, 229, 0.45);
-  --shadow-glow-soft: 0 0 24px rgba(129, 140, 248, 0.35);
-  --shadow-card: 0 10px 40px -8px rgba(0, 0, 0, 0.55);
-  --shadow-pop: 0 14px 50px -10px rgba(0, 0, 0, 0.75);
+  --shadow-glow: 0 0 32px rgba(79, 70, 229, 0.18);
+  --shadow-glow-soft: 0 0 24px rgba(79, 70, 229, 0.12);
+  --shadow-card: 0 8px 24px -10px rgba(15, 16, 32, 0.12);
+  --shadow-pop: 0 14px 40px -12px rgba(15, 16, 32, 0.18);
 }
 
 
@@ -104,8 +101,8 @@
     background-color: var(--color-background);
     color: var(--color-foreground);
     background-image:
-      radial-gradient(circle at 12% 8%, rgba(79, 70, 229, 0.18) 0, transparent 45%),
-      radial-gradient(circle at 88% 0%, rgba(129, 140, 248, 0.12) 0, transparent 40%);
+      radial-gradient(circle at 12% 8%, rgba(79, 70, 229, 0.06) 0, transparent 45%),
+      radial-gradient(circle at 88% 0%, rgba(129, 140, 248, 0.05) 0, transparent 40%);
     background-attachment: fixed;
     font-family: var(--font-sans);
     font-feature-settings: "ss01", "cv11";
@@ -149,7 +146,7 @@
 
   /* scrollbar dark */
   ::-webkit-scrollbar { width: 10px; height: 10px; }
-  ::-webkit-scrollbar-track { background: #0a0a1a; }
-  ::-webkit-scrollbar-thumb { background: #1f1f45; border-radius: 8px; }
-  ::-webkit-scrollbar-thumb:hover { background: #2d2d6e; }
+  ::-webkit-scrollbar-track { background: #f5f6fb; }
+  ::-webkit-scrollbar-thumb { background: #d6d8e3; border-radius: 8px; }
+  ::-webkit-scrollbar-thumb:hover { background: #b9bccc; }
 }

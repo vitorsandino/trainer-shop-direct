@@ -1,11 +1,13 @@
 import { Link } from "@tanstack/react-router";
-import { Instagram, MessageCircle } from "lucide-react";
+import { Instagram, MessageCircle, ExternalLink } from "lucide-react";
 import { CATEGORIES, WHATSAPP_NUMBER } from "@/lib/products";
 import logoH from "@/assets/pandex-logo-horizontal.png";
 
+const MYPCARDS_URL = "https://mypcards.com/pandextcg";
+
 export function Footer() {
   return (
-    <footer className="mt-20 border-t border-border bg-[#05051a] text-foreground">
+    <footer className="mt-20 border-t border-border bg-secondary text-foreground">
       <div className="container mx-auto grid gap-10 px-4 py-14 md:grid-cols-[1.4fr_1fr_1fr_1fr]">
         <div>
           <img src={logoH} alt="Pandex Store" className="h-14 w-auto object-contain" />
@@ -14,12 +16,16 @@ export function Footer() {
           </p>
           <div className="mt-5 flex items-center gap-2">
             <a href={`https://wa.me/${WHATSAPP_NUMBER}`} target="_blank" rel="noopener noreferrer" aria-label="WhatsApp"
-              className="grid h-10 w-10 place-items-center rounded-full border border-border transition hover:border-[var(--whatsapp)] hover:text-[var(--whatsapp)]">
+              className="grid h-10 w-10 place-items-center rounded-full border border-border bg-card transition hover:border-[var(--whatsapp)] hover:text-[var(--whatsapp)]">
               <MessageCircle className="h-4 w-4" />
             </a>
             <a href="https://instagram.com/pandex.store" target="_blank" rel="noopener noreferrer" aria-label="Instagram"
-              className="grid h-10 w-10 place-items-center rounded-full border border-border transition hover:border-[var(--highlight)] hover:text-[var(--highlight)]">
+              className="grid h-10 w-10 place-items-center rounded-full border border-border bg-card transition hover:border-[var(--highlight)] hover:text-[var(--highlight)]">
               <Instagram className="h-4 w-4" />
+            </a>
+            <a href={MYPCARDS_URL} target="_blank" rel="noopener noreferrer" aria-label="MyPCards"
+              className="inline-flex h-10 items-center gap-1.5 rounded-full border border-border bg-card px-3 text-xs font-semibold transition hover:border-primary hover:text-primary">
+              <ExternalLink className="h-3.5 w-3.5" /> MyPCards
             </a>
           </div>
         </div>
@@ -56,6 +62,10 @@ export function Footer() {
           <a href="https://instagram.com/pandex.store" target="_blank" rel="noopener noreferrer"
             className="mt-4 inline-flex items-center gap-1.5 text-sm text-[var(--highlight)] hover:underline">
             <Instagram className="h-4 w-4" /> @pandex.store
+          </a>
+          <a href={MYPCARDS_URL} target="_blank" rel="noopener noreferrer"
+            className="mt-2 inline-flex items-center gap-1.5 text-sm text-foreground/80 hover:text-primary hover:underline">
+            <ExternalLink className="h-4 w-4" /> mypcards.com/pandextcg
           </a>
         </div>
       </div>
