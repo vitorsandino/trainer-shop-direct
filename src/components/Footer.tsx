@@ -63,6 +63,10 @@ export function Footer() {
             className="mt-4 inline-flex items-center gap-1.5 text-sm text-[var(--highlight)] hover:underline">
             <Instagram className="h-4 w-4" /> @pandex.store
           </a>
+          <a href={MYPCARDS_URL} target="_blank" rel="noopener noreferrer"
+            className="mt-2 inline-flex items-center gap-1.5 text-sm text-foreground/80 hover:text-primary hover:underline">
+            <ExternalLink className="h-4 w-4" /> mypcards.com/pandextcg
+          </a>
         </div>
       </div>
 
