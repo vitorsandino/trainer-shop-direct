@@ -146,7 +146,7 @@
 
   /* scrollbar dark */
   ::-webkit-scrollbar { width: 10px; height: 10px; }
-  ::-webkit-scrollbar-track { background: #0a0a1a; }
-  ::-webkit-scrollbar-thumb { background: #1f1f45; border-radius: 8px; }
-  ::-webkit-scrollbar-thumb:hover { background: #2d2d6e; }
+  ::-webkit-scrollbar-track { background: #f5f6fb; }
+  ::-webkit-scrollbar-thumb { background: #d6d8e3; border-radius: 8px; }
+  ::-webkit-scrollbar-thumb:hover { background: #b9bccc; }
 }
