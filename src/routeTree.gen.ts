@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as PokemonRouteImport } from './routes/pokemon'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as EsqueciSenhaRouteImport } from './routes/esqueci-senha'
 import { Route as ContatoRouteImport } from './routes/contato'
@@ -28,6 +29,11 @@ import { Route as ContaPedidosIdRouteImport } from './routes/conta.pedidos.$id'
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
   path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PokemonRoute = PokemonRouteImport.update({
+  id: '/pokemon',
+  path: '/pokemon',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -111,6 +117,7 @@ export interface FileRoutesByFullPath {
   '/contato': typeof ContatoRoute
   '/esqueci-senha': typeof EsqueciSenhaRoute
   '/login': typeof LoginRoute
+  '/pokemon': typeof PokemonRoute
   '/reset-password': typeof ResetPasswordRoute
   '/categoria/$slug': typeof CategoriaSlugRoute
   '/produto/$id': typeof ProdutoIdRoute
@@ -127,6 +134,7 @@ export interface FileRoutesByTo {
   '/contato': typeof ContatoRoute
   '/esqueci-senha': typeof EsqueciSenhaRoute
   '/login': typeof LoginRoute
+  '/pokemon': typeof PokemonRoute
   '/reset-password': typeof ResetPasswordRoute
   '/categoria/$slug': typeof CategoriaSlugRoute
   '/produto/$id': typeof ProdutoIdRoute
@@ -145,6 +153,7 @@ export interface FileRoutesById {
   '/contato': typeof ContatoRoute
   '/esqueci-senha': typeof EsqueciSenhaRoute
   '/login': typeof LoginRoute
+  '/pokemon': typeof PokemonRoute
   '/reset-password': typeof ResetPasswordRoute
   '/categoria/$slug': typeof CategoriaSlugRoute
   '/produto/$id': typeof ProdutoIdRoute
@@ -164,6 +173,7 @@ export interface FileRouteTypes {
     | '/contato'
     | '/esqueci-senha'
     | '/login'
+    | '/pokemon'
     | '/reset-password'
     | '/categoria/$slug'
     | '/produto/$id'
@@ -180,6 +190,7 @@ export interface FileRouteTypes {
     | '/contato'
     | '/esqueci-senha'
     | '/login'
+    | '/pokemon'
     | '/reset-password'
     | '/categoria/$slug'
     | '/produto/$id'
@@ -197,6 +208,7 @@ export interface FileRouteTypes {
     | '/contato'
     | '/esqueci-senha'
     | '/login'
+    | '/pokemon'
     | '/reset-password'
     | '/categoria/$slug'
     | '/produto/$id'
@@ -215,6 +227,7 @@ export interface RootRouteChildren {
   ContatoRoute: typeof ContatoRoute
   EsqueciSenhaRoute: typeof EsqueciSenhaRoute
   LoginRoute: typeof LoginRoute
+  PokemonRoute: typeof PokemonRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   CategoriaSlugRoute: typeof CategoriaSlugRoute
   ProdutoIdRoute: typeof ProdutoIdRoute
@@ -227,6 +240,13 @@ declare module '@tanstack/react-router' {
       path: '/reset-password'
       fullPath: '/reset-password'
       preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pokemon': {
+      id: '/pokemon'
+      path: '/pokemon'
+      fullPath: '/pokemon'
+      preLoaderRoute: typeof PokemonRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -354,6 +374,7 @@ const rootRouteChildren: RootRouteChildren = {
   ContatoRoute: ContatoRoute,
   EsqueciSenhaRoute: EsqueciSenhaRoute,
   LoginRoute: LoginRoute,
+  PokemonRoute: PokemonRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   CategoriaSlugRoute: CategoriaSlugRoute,
   ProdutoIdRoute: ProdutoIdRoute,
