@@ -1,11 +1,13 @@
 import { Link } from "@tanstack/react-router";
-import { Instagram, MessageCircle } from "lucide-react";
+import { Instagram, MessageCircle, ExternalLink } from "lucide-react";
 import { CATEGORIES, WHATSAPP_NUMBER } from "@/lib/products";
 import logoH from "@/assets/pandex-logo-horizontal.png";
 
+const MYPCARDS_URL = "https://mypcards.com/pandextcg";
+
 export function Footer() {
   return (
-    <footer className="mt-20 border-t border-border bg-[#05051a] text-foreground">
+    <footer className="mt-20 border-t border-border bg-secondary text-foreground">
       <div className="container mx-auto grid gap-10 px-4 py-14 md:grid-cols-[1.4fr_1fr_1fr_1fr]">
         <div>
           <img src={logoH} alt="Pandex Store" className="h-14 w-auto object-contain" />
