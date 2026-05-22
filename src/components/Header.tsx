@@ -91,6 +91,7 @@ export function Header() {
 
           <nav className="ml-2 hidden items-center gap-1 lg:flex">
             <Link to="/" className={path === "/" ? navLinkActive : navLink}>Início</Link>
+            <Link to="/pokemon" className={path === "/pokemon" ? navLinkActive : navLink}>Pokémon</Link>
             {CATEGORIES.slice(0, 4).map(c => (
               <Link key={c.value} to="/categoria/$slug" params={{ slug: c.value }}
                 className={path.includes(`/categoria/${c.value}`) ? navLinkActive : navLink}>
@@ -98,7 +99,6 @@ export function Header() {
               </Link>
             ))}
             <Link to="/contato" className={path === "/contato" ? navLinkActive : navLink}>Contato</Link>
-            <Link to="/pokemon" className={path === "/pokemon" ? navLinkActive : navLink}>Pokémon</Link>
           </nav>
 
           <div ref={wrapRef} className="relative ml-auto hidden flex-1 max-w-md md:block">
