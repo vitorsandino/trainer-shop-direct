@@ -91,6 +91,7 @@ export function Header() {
 
           <nav className="ml-2 hidden items-center gap-1 lg:flex">
             <Link to="/" className={path === "/" ? navLinkActive : navLink}>Início</Link>
+            <Link to="/pokemon" className={path === "/pokemon" ? navLinkActive : navLink}>Pokémon</Link>
             {CATEGORIES.slice(0, 4).map(c => (
               <Link key={c.value} to="/categoria/$slug" params={{ slug: c.value }}
                 className={path.includes(`/categoria/${c.value}`) ? navLinkActive : navLink}>
@@ -98,7 +99,6 @@ export function Header() {
               </Link>
             ))}
             <Link to="/contato" className={path === "/contato" ? navLinkActive : navLink}>Contato</Link>
-            <Link to="/pokemon" className={path === "/pokemon" ? navLinkActive : navLink}>Pokémon</Link>
           </nav>
 
           <div ref={wrapRef} className="relative ml-auto hidden flex-1 max-w-md md:block">
@@ -167,6 +167,7 @@ export function Header() {
               </div>
             </form>
             <Link to="/" onClick={() => setOpen(false)} className="block rounded-full bg-primary px-4 py-2 text-center text-sm font-semibold text-primary-foreground">Início</Link>
+            <Link to="/pokemon" onClick={() => setOpen(false)} className="block rounded-full border border-border bg-background px-4 py-2 text-center text-sm font-semibold">Pokémon</Link>
             <div className="grid grid-cols-2 gap-2">
               {CATEGORIES.map(c => (
                 <Link key={c.value} to="/categoria/$slug" params={{ slug: c.value }} onClick={() => setOpen(false)} className="rounded-full bg-background px-4 py-2 text-center text-sm font-semibold border border-border">
