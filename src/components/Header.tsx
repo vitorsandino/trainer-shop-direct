@@ -167,6 +167,7 @@ export function Header() {
               </div>
             </form>
             <Link to="/" onClick={() => setOpen(false)} className="block rounded-full bg-primary px-4 py-2 text-center text-sm font-semibold text-primary-foreground">Início</Link>
+            <Link to="/pokemon" onClick={() => setOpen(false)} className="block rounded-full border border-border bg-background px-4 py-2 text-center text-sm font-semibold">Pokémon</Link>
             <div className="grid grid-cols-2 gap-2">
               {CATEGORIES.map(c => (
                 <Link key={c.value} to="/categoria/$slug" params={{ slug: c.value }} onClick={() => setOpen(false)} className="rounded-full bg-background px-4 py-2 text-center text-sm font-semibold border border-border">
